@@ -42,6 +42,9 @@ args+=(-DBUILD_EXAMPLES=OFF)
 args+=(-DBUILD_SHARED_LIBS=OFF)
 args+=(-DBUILD_TESTING=OFF)
 args+=(-DCMAKE_POLICY_VERSION_MINIMUM=3.5)
+args+=(-DITK_USE_SYSTEM_ZLIB=ON) # bundled itkzlib redefines fdopen() on macOS, which breaks with current SDKs; Horos links the system libz anyway
+# ITK's bundled libpng includes <fp.h> on macOS, which current SDKs no longer ship; provide a shim
+args+=(-DCMAKE_C_FLAGS="-I$PROJECT_DIR/Horos/Scripts/compat")
 args+=(-DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET")
 args+=(-DCMAKE_OSX_ARCHITECTURES="$ARCHS")
 

@@ -51,6 +51,7 @@ args+=(-DBUILD_DOC=OFF)
 args+=(-DBUILD_SHARED_LIBS=OFF)
 args+=(-DBUILD_STATIC_LIBS=ON)
 args+=(-DBUILD_TESTING=OFF)
+args+=(-DBUILD_CODEC=OFF) # only libopenjp2 is needed; the codec tools pull in thirdparty libs that no longer build with current SDKs
 args+=(-DBUILD_THIRDPARTY=ON)
 args+=(-DCMAKE_POLICY_VERSION_MINIMUM=3.5)
 

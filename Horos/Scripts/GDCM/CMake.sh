@@ -37,6 +37,7 @@ export CC=clang
 export CXX=clang
 
 args=( "$source_dir" )
+args+=(-DCMAKE_POLICY_VERSION_MINIMUM=3.5)
 cfs=( $OTHER_CFLAGS )
 cxxfs=( $OTHER_CPLUSPLUSFLAGS )
 
@@ -49,10 +50,16 @@ args+=(-DGDCM_USE_SYSTEM_OPENJPEG=ON)
 args+=(-DCMAKE_IGNORE_PATH="/opt/local/include;/opt/local/lib")
 
 openjpeg_install="$CONFIGURATION_TEMP_DIR/OpenJPEG.build/Install"
-openjpeg_include="$openjpeg_install/include/openjpeg-2.5"
+openjpeg_include="$openjpeg_install/include/OpenJPEG"
+if [ ! -f "$openjpeg_include/openjpeg.h" ]; then
+    openjpeg_include="$openjpeg_install/include/openjpeg-2.5"
+fi
 if [ ! -d "$openjpeg_include" ]; then
     openjpeg_include="$openjpeg_install/include/openjpeg-2.3"
 fi
+# GDCM's FindOpenJPEG takes the version from pkg-config; point it at our own OpenJPEG build
+# instead of relying on a Homebrew openjpeg being installed
+export PKG_CONFIG_PATH="$openjpeg_install/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 args+=(-DOPENJPEG_LIBRARIES="$openjpeg_install/lib/libopenjp2.a")
 args+=(-DOPENJPEG_INCLUDE_DIRS="$openjpeg_include")
 

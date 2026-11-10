@@ -33,7 +33,17 @@ mv "$cmake_dir" "$cmake_dir.tmp"
 rm -Rf "$cmake_dir.tmp" "$install_dir.tmp"
 mkdir -p "$cmake_dir";
 
+# Apply local fixes to the DCMTK submodule sources (skipped if already applied)
+for patch in "$PROJECT_DIR/Horos/Scripts/DCMTK/patches/"*.patch; do
+    [ -e "$patch" ] || continue
+    if git -C "$source_dir" apply --reverse --check "$patch" >/dev/null 2>&1; then
+        continue
+    fi
+    git -C "$source_dir" apply "$patch"
+done
+
 args=( "$source_dir" )
+args+=(-DCMAKE_POLICY_VERSION_MINIMUM=3.5)
 cfs=( $OTHER_CFLAGS )
 cxxfs=( $OTHER_CPLUSPLUSFLAGS )
 

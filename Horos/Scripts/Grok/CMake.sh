@@ -37,6 +37,7 @@ export CC=clang
 export CXX=clang
 
 args=("$source_dir")
+args+=(-DCMAKE_POLICY_VERSION_MINIMUM=3.5)
 cfs=($OTHER_CFLAGS)
 cxxfs=($OTHER_CPLUSPLUSFLAGS)
 ldfs=($OTHER_LDFLAGS)

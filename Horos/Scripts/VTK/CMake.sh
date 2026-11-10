@@ -34,6 +34,15 @@ mv "$cmake_dir" "$cmake_dir.tmp"
 rm -Rf "$cmake_dir.tmp" "$install_dir.tmp"
 mkdir -p "$cmake_dir"; cd "$cmake_dir"
 
+# Apply local fixes to the VTK submodule sources (skipped if already applied)
+for patch in "$PROJECT_DIR/Horos/Scripts/VTK/patches/"*.patch; do
+    [ -e "$patch" ] || continue
+    if git -C "$PROJECT_DIR/$TARGET_NAME" apply --reverse --check "$patch" >/dev/null 2>&1; then
+        continue
+    fi
+    git -C "$PROJECT_DIR/$TARGET_NAME" apply "$patch"
+done
+
 args=("$PROJECT_DIR/$TARGET_NAME") # -G Xcode
 cxxfs=( -w -fvisibility=default )
 args+=(-DVTK_USE_X:BOOL=OFF)
@@ -46,6 +55,9 @@ args+=(-DBUILD_TESTING=OFF)
 args+=(-DCMAKE_POLICY_VERSION_MINIMUM=3.5)
 args+=(-DCMAKE_OSX_DEPLOYMENT_TARGET="$MACOSX_DEPLOYMENT_TARGET")
 args+=(-DCMAKE_OSX_ARCHITECTURES="$ARCHS")
+
+# VTK's bundled libpng includes <fp.h> on macOS, which current SDKs no longer ship; provide a shim
+args+=(-DCMAKE_C_FLAGS="-I$PROJECT_DIR/Horos/Scripts/compat")
 
 args+=(-DVTK_USE_SYSTEM_ZLIB:BOOL=ON)
 args+=(-DVTK_USE_SYSTEM_EXPAT=ON)

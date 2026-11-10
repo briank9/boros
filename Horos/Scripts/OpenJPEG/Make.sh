@@ -20,7 +20,9 @@ cd "$cmake_dir"
 make "${args[@]}"
 make install
 
-rsync "$cmake_dir/bin/libopenjp2.a" "$install_dir/lib/" # somehow the lib isn't copied by make-install
+if [ ! -f "$install_dir/lib/libopenjp2.a" ]; then # older CMake versions don't install the static lib
+    rsync "$cmake_dir/bin/libopenjp2.a" "$install_dir/lib/"
+fi
 rsync "$source_dir/src/bin/common/format_defs.h" "$install_dir/include/OpenJPEG/" # we need this header
 # Ensure OpenJPEG headers are available at include/OpenJPEG for legacy includes
 if [ -d "$install_dir/include/openjpeg-2.5" ]; then
