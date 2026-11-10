@@ -879,7 +879,7 @@ BOOL gPluginsAlertAlreadyDisplayed = NO;
         {
             NSString *pluginCrashPath = [NSString stringWithContentsOfFile: pluginCrash encoding: NSUTF8StringEncoding error: nil];
             
-            int result = NSRunInformationalAlertPanel(NSLocalizedString(@"Horos crashed", nil), NSLocalizedString(@"Previous crash is maybe related to a plugin.\r\rShould I remove this plugin (%@)?", nil), NSLocalizedString(@"Delete Plugin",nil), NSLocalizedString(@"Continue",nil), nil, [pluginCrashPath lastPathComponent]);
+            int result = NSRunInformationalAlertPanel(NSLocalizedString(@"Boros crashed", nil), NSLocalizedString(@"Previous crash is maybe related to a plugin.\r\rShould I remove this plugin (%@)?", nil), NSLocalizedString(@"Delete Plugin",nil), NSLocalizedString(@"Continue",nil), nil, [pluginCrashPath lastPathComponent]);
             
             if( result == NSAlertDefaultReturn) // Delete Plugin
             {
@@ -1163,7 +1163,7 @@ BOOL gPluginsAlertAlreadyDisplayed = NO;
 	}
     
     if( !gPluginsAlertAlreadyDisplayed)
-        NSRunInformationalAlertPanel(NSLocalizedString(@"Plugins", @""), NSLocalizedString( @"Restart Horos to apply the changes to the plugins.", @""), NSLocalizedString(@"OK", @""), nil, nil);
+        NSRunInformationalAlertPanel(NSLocalizedString(@"Plugins", @""), NSLocalizedString( @"Restart Boros to apply the changes to the plugins.", @""), NSLocalizedString(@"OK", @""), nil, nil);
     gPluginsAlertAlreadyDisplayed = YES;
 }
 
@@ -1201,7 +1201,7 @@ BOOL gPluginsAlertAlreadyDisplayed = NO;
 	}
     
     if( !gPluginsAlertAlreadyDisplayed)
-        NSRunInformationalAlertPanel(NSLocalizedString(@"Plugins", @""), NSLocalizedString( @"Restart Horos to apply the changes to the plugins.", @""), NSLocalizedString(@"OK", @""), nil, nil);
+        NSRunInformationalAlertPanel(NSLocalizedString(@"Plugins", @""), NSLocalizedString( @"Restart Boros to apply the changes to the plugins.", @""), NSLocalizedString(@"OK", @""), nil, nil);
     gPluginsAlertAlreadyDisplayed = YES;
 }
 
@@ -1214,7 +1214,7 @@ BOOL gPluginsAlertAlreadyDisplayed = NO;
 #ifdef MACAPPSTORE
     if([availability isEqualTo:[availabilities objectAtIndex:0]] == NO)
     {
-        NSRunCriticalAlertPanel( NSLocalizedString(@"Plugin",nil),  NSLocalizedString( @"You cannot move the plugin to another location with this version of Horos.", nil), NSLocalizedString(@"OK",nil), nil, nil);
+        NSRunCriticalAlertPanel( NSLocalizedString(@"Plugin",nil),  NSLocalizedString( @"You cannot move the plugin to another location with this version of Boros.", nil), NSLocalizedString(@"OK",nil), nil, nil);
     }
 #endif
     
@@ -1445,7 +1445,7 @@ BOOL gPluginsAlertAlreadyDisplayed = NO;
 	}
 	
     if( !gPluginsAlertAlreadyDisplayed)
-        NSRunInformationalAlertPanel(NSLocalizedString(@"Plugins", @""), NSLocalizedString( @"Restart Horos to apply the changes to the plugins.", @""), NSLocalizedString(@"OK", @""), nil, nil);
+        NSRunInformationalAlertPanel(NSLocalizedString(@"Plugins", @""), NSLocalizedString( @"Restart Boros to apply the changes to the plugins.", @""), NSLocalizedString(@"OK", @""), nil, nil);
     gPluginsAlertAlreadyDisplayed = YES;
     
 	return returnPath;
@@ -1610,7 +1610,7 @@ NSInteger sortPluginArray(id plugin1, id plugin2, void *context)
 {
 	return [NSArray arrayWithObjects:NSLocalizedString(@"Current user", nil),
                                      NSLocalizedString(@"All users", nil),
-                                     NSLocalizedString(@"Horos bundle", nil), nil];
+                                     NSLocalizedString(@"Boros bundle", nil), nil];
 }
 
 
@@ -1860,7 +1860,7 @@ NSInteger sortPluginArray(id plugin1, id plugin2, void *context)
 	else
 	{
         if( !gPluginsAlertAlreadyDisplayed)
-            NSRunInformationalAlertPanel(NSLocalizedString(@"Plugin Update Completed", @""), NSLocalizedString(@"All your plugins are now up to date. Restart Horos to use the new or updated plugins.", @""), NSLocalizedString(@"OK", @""), nil, nil);
+            NSRunInformationalAlertPanel(NSLocalizedString(@"Plugin Update Completed", @""), NSLocalizedString(@"All your plugins are now up to date. Restart Boros to use the new or updated plugins.", @""), NSLocalizedString(@"OK", @""), nil, nil);
 		gPluginsAlertAlreadyDisplayed = YES;
         
         startedUpdateProcess = NO;

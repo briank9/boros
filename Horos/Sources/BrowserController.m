@@ -2251,8 +2251,8 @@ static NSConditionLock *threadLock = nil;
                 
             case ask:
                 switch (NSRunInformationalAlertPanel(
-                                                     NSLocalizedString(@"Horos Database", nil),
-                                                     NSLocalizedString(@"Should I copy these files in Horos Database folder, or only copy links to these files?", nil),
+                                                     NSLocalizedString(@"Boros Database", nil),
+                                                     NSLocalizedString(@"Should I copy these files in Boros Database folder, or only copy links to these files?", nil),
                                                      NSLocalizedString(@"Copy Files", nil),
                                                      NSLocalizedString(@"Cancel", nil),
                                                      NSLocalizedString(@"Copy Links", nil)))
@@ -8830,7 +8830,7 @@ static NSConditionLock *threadLock = nil;
     
     NSSavePanel *sPanel	= [NSSavePanel savePanel];
     [sPanel setAllowedFileTypes:@[@"txt"]];
-    sPanel.nameFieldStringValue = NSLocalizedString(@"Horos Database List", nil);
+    sPanel.nameFieldStringValue = NSLocalizedString(@"Boros Database List", nil);
     
     [sPanel beginWithCompletionHandler:^(NSInteger result) {
         if (result != NSFileHandlingPanelOKButton)
@@ -13819,7 +13819,7 @@ static NSArray*	openSubSeriesArray = nil;
         
         if( [DCMPix isRunOsiriXInProtectedModeActivated])
         {
-            NSRunCriticalAlertPanel(NSLocalizedString(@"Protected Mode", nil), NSLocalizedString(@"Horos is now running in Protected Mode (shift + option keys at startup): no images are displayed, allowing you to delete crashing or corrupted images/studies.", nil), NSLocalizedString(@"OK", nil), nil, nil);
+            NSRunCriticalAlertPanel(NSLocalizedString(@"Protected Mode", nil), NSLocalizedString(@"Boros is now running in Protected Mode (shift + option keys at startup): no images are displayed, allowing you to delete crashing or corrupted images/studies.", nil), NSLocalizedString(@"OK", nil), nil, nil);
         }
         
         _distantAlbumNoOfStudiesCache = [[NSMutableDictionary alloc] init];
@@ -14414,7 +14414,7 @@ static NSArray*	openSubSeriesArray = nil;
             N2LogExceptionWithStackTrace(ne);
             [@"" writeToFile:_database.loadingFilePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
             
-            NSString *message = [NSString stringWithFormat: NSLocalizedString(@"A problem occured during start-up of Horos:\r\r%@\r\r%@",nil), [ne description], [AppController printStackTrace: ne]];
+            NSString *message = [NSString stringWithFormat: NSLocalizedString(@"A problem occured during start-up of Boros:\r\r%@\r\r%@",nil), [ne description], [AppController printStackTrace: ne]];
             
             NSRunCriticalAlertPanel(NSLocalizedString(@"Error",nil), @"%@", NSLocalizedString( @"OK",nil), nil, nil, message);
             
@@ -14534,7 +14534,7 @@ static NSArray*	openSubSeriesArray = nil;
         NSAlert *alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK",nil)];
         [alert setMessageText:NSLocalizedString(@"Not validated OsiriX plugins were detected!",nil)];
-        [alert setInformativeText:NSLocalizedString(@"Not validated OsiriX plugins may cause Horos run-time errors. In case of problems, you can disable/uninstall them in [Plugins => Plugin Manager]. A brand new Horos plugin database is being built for you.",nil)];
+        [alert setInformativeText:NSLocalizedString(@"Not validated OsiriX plugins may cause Boros run-time errors. In case of problems, you can disable/uninstall them in [Plugins => Plugin Manager]. A brand new Boros plugin database is being built for you.",nil)];
         [alert setAlertStyle:NSWarningAlertStyle];
         [alert runModal];
         [alert release];
@@ -15266,7 +15266,7 @@ static NSArray*	openSubSeriesArray = nil;
     [helpMenu addItem: [NSMenuItem separatorItem]];
     [helpMenu addItemWithTitle: NSLocalizedString(@"Report a bug", nil) action: @selector(openBugReportPage:) keyEquivalent: @""];
     //[helpMenu addItem: [NSMenuItem separatorItem]];
-    //[helpMenu addItemWithTitle: NSLocalizedString(@"Send an email to Horos support", nil) action: @selector(sendEmail:) keyEquivalent: @""];
+    //[helpMenu addItemWithTitle: NSLocalizedString(@"Send an email to Boros support", nil) action: @selector(sendEmail:) keyEquivalent: @""];
     
     [helpMenu release];
 }
@@ -19402,7 +19402,7 @@ restart:
     {
         [toolbarItem setLabel: NSLocalizedString(@"Migration Assistant",nil)];
         [toolbarItem setPaletteLabel: NSLocalizedString(@"Migration Assistant",nil)];
-        [toolbarItem setToolTip: NSLocalizedString(@"Open Horos Migration Assistant",nil)];
+        [toolbarItem setToolTip: NSLocalizedString(@"Open Boros Migration Assistant",nil)];
         [toolbarItem setImage: [NSImage imageNamed: HorosMigrationAssistantIdentifier]];
         [toolbarItem setTarget: self];
         [toolbarItem setAction: @selector(openHorosMigrationAssistant:)];
@@ -19457,7 +19457,7 @@ restart:
 
     if ([O2HMigrationAssistant isOsiriXInstalled] == NO)
     {
-        NSRunInformationalAlertPanel(NSLocalizedString(@"Horos Migration Assistant", nil),
+        NSRunInformationalAlertPanel(NSLocalizedString(@"Boros Migration Assistant", nil),
                                      NSLocalizedString(@"It seems you don't have OsiriX installed.", nil),
                                      NSLocalizedString(@"Return",nil), nil, nil);
         return;
@@ -20221,7 +20221,7 @@ restart:
     @catch (NSException* e)
     {
         N2LogExceptionWithStackTrace(e);
-        NSRunAlertPanel(NSLocalizedString(@"Horos Database", nil), NSLocalizedString( @"Horos cannot read/create this file/folder. Permissions error?", nil), nil, nil, nil);
+        NSRunAlertPanel(NSLocalizedString(@"Boros Database", nil), NSLocalizedString( @"Boros cannot read/create this file/folder. Permissions error?", nil), nil, nil, nil);
         [self resetToLocalDatabase];
     }
     

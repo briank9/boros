@@ -1369,7 +1369,7 @@ void exceptionHandler(NSException *exception)
         if( [defaults integerForKey: @"httpWebServer"] == 1 && [defaults integerForKey: @"httpWebServer"] != [[previousDefaults valueForKey: @"httpWebServer"] intValue])
         {
             if( [AppController hasMacOSXSnowLeopard] == NO)
-                NSRunCriticalAlertPanel( NSLocalizedString( @"Unsupported", nil), NSLocalizedString( @"It is highly recommend to upgrade to MacOS 10.6 or higher to use the Horos Web Server.", nil), NSLocalizedString( @"OK", nil) , nil, nil);
+                NSRunCriticalAlertPanel( NSLocalizedString( @"Unsupported", nil), NSLocalizedString( @"It is highly recommend to upgrade to MacOS 10.6 or higher to use the Boros Web Server.", nil), NSLocalizedString( @"OK", nil) , nil, nil);
         }
         
         previousDefaults = dictionaryRepresentation;
@@ -1395,7 +1395,7 @@ void exceptionHandler(NSException *exception)
             if( showRestartNeeded == YES)
             {
                 showRestartNeeded = NO;
-                NSRunAlertPanel( NSLocalizedString( @"DICOM Listener", nil), NSLocalizedString( @"Restart Horos to apply these changes.", nil), NSLocalizedString( @"OK", nil), nil, nil);
+                NSRunAlertPanel( NSLocalizedString( @"DICOM Listener", nil), NSLocalizedString( @"Restart Boros to apply these changes.", nil), NSLocalizedString( @"OK", nil), nil, nil);
             }
         }
         
@@ -2166,7 +2166,7 @@ void exceptionHandler(NSException *exception)
 					
 					[STORESCP unlock];
 				}
-				else NSRunCriticalAlertPanel( NSLocalizedString( @"DICOM Listener Error", nil), NSLocalizedString( @"Cannot start DICOM Listener. Another thread is already running. Restart Horos.", nil), NSLocalizedString( @"OK", nil), nil, nil);
+				else NSRunCriticalAlertPanel( NSLocalizedString( @"DICOM Listener Error", nil), NSLocalizedString( @"Cannot start DICOM Listener. Another thread is already running. Restart Boros.", nil), NSLocalizedString( @"OK", nil), nil, nil);
 			}		
 		}
 		
@@ -2184,7 +2184,7 @@ void exceptionHandler(NSException *exception)
 				
 				[STORESCPTLS unlock];
 			}
-			else NSRunCriticalAlertPanel( NSLocalizedString( @"DICOM TLS Listener Error", nil), NSLocalizedString( @"Cannot start DICOM TLS Listener. Another thread is already running. Restart Horos.", nil), NSLocalizedString( @"OK", nil), nil, nil);
+			else NSRunCriticalAlertPanel( NSLocalizedString( @"DICOM TLS Listener Error", nil), NSLocalizedString( @"Cannot start DICOM TLS Listener. Another thread is already running. Restart Boros.", nil), NSLocalizedString( @"OK", nil), nil, nil);
 		}
 	
 	} @catch (NSException* e) {
@@ -2314,7 +2314,7 @@ void exceptionHandler(NSException *exception)
 	{
 		if( [[NSUserDefaults standardUserDefaults] boolForKey: @"httpXMLRPCServer"] == NO)
 		{
-			int result = NSRunInformationalAlertPanel(NSLocalizedString(@"URL scheme", nil), NSLocalizedString(@"Horos URL scheme [horos:// , osirix://] is currently not activated!\r\rShould I activate it now? Restart is necessary.", nil), NSLocalizedString(@"No",nil), NSLocalizedString(@"Activate & Restart",nil), nil);
+			int result = NSRunInformationalAlertPanel(NSLocalizedString(@"URL scheme", nil), NSLocalizedString(@"Boros URL scheme [horos:// , osirix://] is currently not activated!\r\rShould I activate it now? Restart is necessary.", nil), NSLocalizedString(@"No",nil), NSLocalizedString(@"Activate & Restart",nil), nil);
 			
 			if( result == NSAlertAlternateReturn)
 			{
@@ -2898,7 +2898,7 @@ static BOOL initialized = NO;
                 if( [BrowserController _currentModifierFlags] & NSCommandKeyMask &&
                    [BrowserController _currentModifierFlags] & NSAlternateKeyMask)
                 {
-                    NSInteger result = NSRunInformationalAlertPanel( NSLocalizedString(@"Reset Preferences", nil), NSLocalizedString(@"Are you sure you want to reset ALL preferences of Horos? All the preferences will be reseted to their default values.", nil), NSLocalizedString(@"Cancel",nil), NSLocalizedString(@"OK",nil),  nil);
+                    NSInteger result = NSRunInformationalAlertPanel( NSLocalizedString(@"Reset Preferences", nil), NSLocalizedString(@"Are you sure you want to reset ALL preferences of Boros? All the preferences will be reseted to their default values.", nil), NSLocalizedString(@"Cancel",nil), NSLocalizedString(@"OK",nil),  nil);
                     
                     if( result == NSAlertAlternateReturn)
                     {
@@ -2943,7 +2943,7 @@ static BOOL initialized = NO;
 				#ifdef MACAPPSTORE
 				[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"MACAPPSTORE"]; // Also modify in DefaultsOsiriX.m
 				[[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"AUTHENTICATION"];
-				[[NSUserDefaults standardUserDefaults] setObject: NSLocalizedString( @"(~/Library/Application Support/Horos App/)", nil) forKey:@"DefaultDatabasePath"];
+				[[NSUserDefaults standardUserDefaults] setObject: NSLocalizedString( @"(~/Library/Application Support/Boros App/)", nil) forKey:@"DefaultDatabasePath"];
 				#else
 				[[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"MACAPPSTORE"]; // Also modify in DefaultsOsiriX.m
 				[[NSUserDefaults standardUserDefaults] setObject: NSLocalizedString( @"(Current User Documents folder)", nil) forKey:@"DefaultDatabasePath"];
@@ -2986,7 +2986,7 @@ static BOOL initialized = NO;
                     NSString* volumePath = [[[dataBasePath componentsSeparatedByString:@"/"] subarrayWithRange:NSMakeRange(0,3)] componentsJoinedByString:@"/"];
                     if (![[NSFileManager defaultManager] fileExistsAtPath:volumePath]) {
                         NSPanel* dialog = [NSPanel alertWithTitle:@"Horos Data"
-                                                          message:[NSString stringWithFormat:NSLocalizedString(@"Horos is configured to use the database located at %@. This volume is currently not available, most likely because it hasn't yet been mounted by the system, or because it is not plugged in or is turned off, or because you don't have write permissions for this location. Horos will wait for a few minutes, then give up and switch to a database in the current user's home directory.", nil), [[NSUserDefaults standardUserDefaults] stringForKey: @"DATABASELOCATIONURL"]]
+                                                          message:[NSString stringWithFormat:NSLocalizedString(@"Boros is configured to use the database located at %@. This volume is currently not available, most likely because it hasn't yet been mounted by the system, or because it is not plugged in or is turned off, or because you don't have write permissions for this location. Boros will wait for a few minutes, then give up and switch to a database in the current user's home directory.", nil), [[NSUserDefaults standardUserDefaults] stringForKey: @"DATABASELOCATIONURL"]]
                                                     defaultButton:@"Quit"
                                                   alternateButton:@"Continue"
                                                              icon:nil];
@@ -3028,7 +3028,7 @@ static BOOL initialized = NO;
                     NSString* volumePath = [[[dataBaseDataPath componentsSeparatedByString:@"/"] subarrayWithRange:NSMakeRange(0,3)] componentsJoinedByString:@"/"];
                     if (![[NSFileManager defaultManager] fileExistsAtPath:volumePath]) {
                         NSPanel* dialog = [NSPanel alertWithTitle:@"Horos Data"
-                                                          message:[NSString stringWithFormat:NSLocalizedString(@"Horos is configured to use the database with data located at %@. This volume is currently not available, most likely because it hasn't yet been mounted by the system, or because it is not plugged in or is turned off, or because you don't have write permissions for this location. Horos will wait for a few minutes, then give up and ignore this highly dangerous situation.", nil), dataBaseDataPath]
+                                                          message:[NSString stringWithFormat:NSLocalizedString(@"Boros is configured to use the database with data located at %@. This volume is currently not available, most likely because it hasn't yet been mounted by the system, or because it is not plugged in or is turned off, or because you don't have write permissions for this location. Boros will wait for a few minutes, then give up and ignore this highly dangerous situation.", nil), dataBaseDataPath]
                                                     defaultButton:@"Quit"
                                                   alternateButton:@"Continue"
                                                              icon:nil];
@@ -3176,7 +3176,7 @@ static BOOL initialized = NO;
                 {
                     if( [[NSFileManager defaultManager] fileExistsAtPath: path])
                     {
-                        int result = NSRunInformationalAlertPanel(NSLocalizedString(@"Horos crashed during last startup", nil), NSLocalizedString(@"Previous crash is maybe related to a corrupt database or corrupted images.\r\rShould I run Horos in Protected Mode (recommended) (no images displayed)? To allow you to delete the crashing/corrupted images/studies.\r\rOr Should I rebuild the local database? All albums, comments and status will be lost.", nil), NSLocalizedString(@"Continue normally",nil), NSLocalizedString(@"Protected Mode",nil), NSLocalizedString(@"Rebuild Database",nil));
+                        int result = NSRunInformationalAlertPanel(NSLocalizedString(@"Boros crashed during last startup", nil), NSLocalizedString(@"Previous crash is maybe related to a corrupt database or corrupted images.\r\rShould I run Boros in Protected Mode (recommended) (no images displayed)? To allow you to delete the crashing/corrupted images/studies.\r\rOr Should I rebuild the local database? All albums, comments and status will be lost.", nil), NSLocalizedString(@"Continue normally",nil), NSLocalizedString(@"Protected Mode",nil), NSLocalizedString(@"Rebuild Database",nil));
                         
                         if( result == NSAlertOtherReturn)
                         {
@@ -3464,7 +3464,7 @@ static BOOL initialized = NO;
 #ifdef OSIRIX_LIGHT
 	@try
 	{
-		int button = NSRunAlertPanel( NSLocalizedString( @"Horos Lite", nil), NSLocalizedString( @"This is the Lite version of Horos: many functions are not available. You can download the full version of Horos on the Internet.", nil), NSLocalizedString( @"Continue", nil), NSLocalizedString( @"Download", nil), nil);
+		int button = NSRunAlertPanel( NSLocalizedString( @"Boros Lite", nil), NSLocalizedString( @"This is the Lite version of Boros: many functions are not available. You can download the full version of Boros on the Internet.", nil), NSLocalizedString( @"Continue", nil), NSLocalizedString( @"Download", nil), nil);
 	
 		if (NSCancelButton == button)
 			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:URL_HOROS_VIEWER]];
@@ -3583,7 +3583,7 @@ static BOOL initialized = NO;
         NSLog( @"SecStaticCodeCheckValidity: %d", (int) status);
         NSLog( @"%@", errors);
         
-        NSRunCriticalAlertPanel( NSLocalizedString( @"Code signing and Certificate", nil), NSLocalizedString( @"Invalid code signing or certificate. You should re-download Horos from the web site\r\rAre you using an utility such as CleanMyMac or CCleaner? Turn it off for Horos.", nil), NSLocalizedString( @"Continue", nil) , nil, nil);
+        NSRunCriticalAlertPanel( NSLocalizedString( @"Code signing and Certificate", nil), NSLocalizedString( @"Invalid code signing or certificate. You should re-download Boros from the web site\r\rAre you using an utility such as CleanMyMac or CCleaner? Turn it off for Boros.", nil), NSLocalizedString( @"Continue", nil) , nil, nil);
 
     }
     CFRelease( requirement);
@@ -3594,7 +3594,7 @@ static BOOL initialized = NO;
     
     if( [AppController hasMacOSXElCapitan] == NO)
     {
-        NSRunCriticalAlertPanel( NSLocalizedString( @"macOS Version", nil), NSLocalizedString( @"Horos requires macOS 10.11 or higher. Please update your OS: Apple Menu - Software Update...", nil), NSLocalizedString( @"Quit", nil) , nil, nil);
+        NSRunCriticalAlertPanel( NSLocalizedString( @"macOS Version", nil), NSLocalizedString( @"Boros requires macOS 10.11 or higher. Please update your OS: Apple Menu - Software Update...", nil), NSLocalizedString( @"Quit", nil) , nil, nil);
         exit( 0);
     }
     
@@ -4020,7 +4020,7 @@ static BOOL initialized = NO;
 	
 	if (startCount == 0) // Replaces FIRSTTIME.
 	{
-		switch( NSRunInformationalAlertPanel( NSLocalizedString(@"Horos Updates", nil), NSLocalizedString( @"Would you like to activate automatic checking for updates?", nil), NSLocalizedString( @"Yes", nil), NSLocalizedString( @"No", nil), nil))
+		switch( NSRunInformationalAlertPanel( NSLocalizedString(@"Boros Updates", nil), NSLocalizedString( @"Would you like to activate automatic checking for updates?", nil), NSLocalizedString( @"Yes", nil), NSLocalizedString( @"No", nil), nil))
 		{
 			case 0:
 				[[NSUserDefaults standardUserDefaults] setObject: @"NO" forKey: @"CheckHorosUpdates"];
@@ -4238,12 +4238,12 @@ static BOOL initialized = NO;
 {
 	if( [msg isEqualToString:@"LISTENER"])
 	{
-		NSRunAlertPanel( NSLocalizedString( @"DICOM Listener Error", nil), NSLocalizedString( @"Horos listener cannot start. Is the Port valid? Is there another process using this Port?\r\rSee Listener - Preferences.", nil), NSLocalizedString( @"OK", nil), nil, nil);
+		NSRunAlertPanel( NSLocalizedString( @"DICOM Listener Error", nil), NSLocalizedString( @"Boros listener cannot start. Is the Port valid? Is there another process using this Port?\r\rSee Listener - Preferences.", nil), NSLocalizedString( @"OK", nil), nil, nil);
 	}
 	
 	if( [msg isEqualToString:@"UPTODATE"])
 	{
-		NSRunAlertPanel( NSLocalizedString( @"Horos is up-to-date", nil), NSLocalizedString( @"You have the most recent version of Horos.", nil), NSLocalizedString( @"OK", nil), nil, nil);
+		NSRunAlertPanel( NSLocalizedString( @"Boros is up-to-date", nil), NSLocalizedString( @"You have the most recent version of Boros.", nil), NSLocalizedString( @"OK", nil), nil, nil);
 	}
 	
 	if( [msg isEqualToString:@"ERROR"])
@@ -4253,14 +4253,14 @@ static BOOL initialized = NO;
 	
     if( [msg isEqualToString: @"UPDATECRASH"])
     {
-        NSRunInformationalAlertPanel(NSLocalizedString(@"Horos crashed", nil), NSLocalizedString(@"Horos crashed... You are running an outdated version of Horos ! This bug is probably corrected in the last version !", nil), NSLocalizedString(@"OK",nil), nil, nil);
+        NSRunInformationalAlertPanel(NSLocalizedString(@"Boros crashed", nil), NSLocalizedString(@"Boros crashed... You are running an outdated version of Boros ! This bug is probably corrected in the last version !", nil), NSLocalizedString(@"OK",nil), nil, nil);
         
         [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:URL_HOROS_UPDATE_CRASH]];
     }
     
 	if( [msg isEqualToString:@"UPDATE"])
 	{
-		int button = NSRunAlertPanel( NSLocalizedString( @"New Version Available", nil), NSLocalizedString( @"A new version of Horos is available. Would you like to download the new version now?", nil), NSLocalizedString( @"Download", nil), NSLocalizedString( @"Continue", nil), nil);
+		int button = NSRunAlertPanel( NSLocalizedString( @"New Version Available", nil), NSLocalizedString( @"A new version of Boros is available. Would you like to download the new version now?", nil), NSLocalizedString( @"Download", nil), NSLocalizedString( @"Continue", nil), nil);
 		
 		if (NSOKButton == button)
 			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:URL_HOROS_UPDATE]];
@@ -4272,12 +4272,12 @@ static BOOL initialized = NO;
 	WaitRendering *wait = nil;
 	
 	#ifdef OSIRIX_LIGHT
-	wait = [[[WaitRendering alloc] init: NSLocalizedString(@"Starting Horos Lite...", nil)] autorelease];
+	wait = [[[WaitRendering alloc] init: NSLocalizedString(@"Starting Boros Lite...", nil)] autorelease];
 	#else
 	if( sizeof( long) == 8)
-		wait = [[WaitRendering alloc] init: NSLocalizedString(@"Starting Horos 64-bit", nil)];
+		wait = [[WaitRendering alloc] init: NSLocalizedString(@"Starting Boros 64-bit", nil)];
 	else
-		wait = [[WaitRendering alloc] init: NSLocalizedString(@"Starting Horos 32-bit", nil)];
+		wait = [[WaitRendering alloc] init: NSLocalizedString(@"Starting Boros 32-bit", nil)];
 	#endif
 
 	return wait;

@@ -130,22 +130,6 @@ BOOL useQuartz() {
 - (void) awakeFromNib
 {
     {
-        WebFrame * mf = [aboutWebView mainFrame];
-        
-        NSString* resourceURLString = [[[NSBundle mainBundle] resourceURL] absoluteString];
-        NSURL *theURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@Splash/about.html",resourceURLString]];
-        NSURLRequest * theURLRequest = [NSURLRequest requestWithURL:theURL];
-        [mf loadRequest:theURLRequest];;
-        
-        //TODO - Try to load remotely, and in case if fails, load locally
-        
-        //theURL = [NSURL URLWithString:@"http://127.0.0.1:8887/about.html"];
-        //theURLRequest = [NSURLRequest requestWithURL:theURL];
-        //[mf loadRequest:theURLRequest];;
-    }
-    
-    
-    {
         WebFrame * mf = [releaseNotesWebView mainFrame];
         
         NSString* resourceURLString = [[[NSBundle mainBundle] resourceURL] absoluteString];
@@ -160,22 +144,6 @@ BOOL useQuartz() {
         //[mf loadRequest:theURLRequest];;
     }
     
-    
-    {
-        WebFrame * mf = [partnersWebView mainFrame];
-        
-        NSString* resourceURLString = [[[NSBundle mainBundle] resourceURL] absoluteString];
-        NSURL *theURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@Splash/partners.html",resourceURLString]];
-        NSURLRequest * theURLRequest = [NSURLRequest requestWithURL:theURL];
-        [mf loadRequest:theURLRequest];;
-        
-        //TODO - Try to load remotely, and in case if fails, load locally
-        
-        //theURL = [NSURL URLWithString:@"http://127.0.0.1:8887/partners.html"];
-        //theURLRequest = [NSURLRequest requestWithURL:theURL];
-        //[mf loadRequest:theURLRequest];;
-    }
-  
     self.window.level = NSFloatingWindowLevel;
 }
 

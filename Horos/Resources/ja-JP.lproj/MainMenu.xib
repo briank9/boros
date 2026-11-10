@@ -20,7 +20,7 @@
                 <menuItem title="Horos" id="56">
                     <menu key="submenu" title="Horos" systemMenu="apple" id="57">
                         <items>
-                            <menuItem title="Horos について" id="58">
+                            <menuItem title="Boros について" id="58">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="about:" target="694" id="1115"/>
@@ -40,7 +40,7 @@
                             <menuItem isSeparatorItem="YES" id="143">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Horosを隠す" keyEquivalent="h" id="134">
+                            <menuItem title="Borosを隠す" keyEquivalent="h" id="134">
                                 <connections>
                                     <action selector="hide:" target="-2" id="152"/>
                                 </connections>
@@ -59,7 +59,7 @@
                             <menuItem isSeparatorItem="YES" id="149">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Horosを終了" keyEquivalent="q" id="136">
+                            <menuItem title="Borosを終了" keyEquivalent="q" id="136">
                                 <connections>
                                     <action selector="terminate:" target="694" id="1722"/>
                                 </connections>

@@ -2977,7 +2977,7 @@ extern "C"
 	
 	NSSavePanel *panel = [NSSavePanel savePanel];
     panel.allowedFileTypes = @[@"txt"];
-    panel.nameFieldStringValue = NSLocalizedString(@"Horos Database List", nil);
+    panel.nameFieldStringValue = NSLocalizedString(@"Boros Database List", nil);
 		
     [panel beginWithCompletionHandler:^(NSInteger result) {
         if (result != NSFileHandlingPanelOKButton)
