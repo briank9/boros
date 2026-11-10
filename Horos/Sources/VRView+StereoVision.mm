@@ -1864,7 +1864,7 @@ static void  updateRight(vtkObject*, unsigned long eid, void* clientdata, void *
          else*/
         {
             
-            NSRect size = [self bounds];
+            NSRect size = [self convertRectToBacking: [self bounds]]; // Retina: read the full backing store, not just the bottom-left quarter
             
             *width = (long) size.size.width*2.0;
             long leftWidth = (long) size.size.width;
@@ -2031,7 +2031,7 @@ static void  updateRight(vtkObject*, unsigned long eid, void* clientdata, void *
         {
             int i;
             
-            NSRect size = [self bounds];
+            NSRect size = [self convertRectToBacking: [self bounds]]; // Retina: read the full backing store, not just the bottom-left quarter
             
             *width = (long) size.size.width;
             *width/=4;

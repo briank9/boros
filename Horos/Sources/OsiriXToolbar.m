@@ -39,12 +39,51 @@
 #import "ViewerController.h"
 #import "ToolbarPanel.h"
 #import "NSWindow+N2.h"
+#import <objc/runtime.h>
 
 @implementation OsiriXToolbar
 
 - (void)runCustomizationPalette:(id)sender
 {
 	[super runCustomizationPalette: sender];
+}
+
+@end
+
+#pragma mark - Toolbar image sizing
+
+// Horos toolbar images are mostly .icns/.tiff files with large representations (up to 1024px).
+// Apps linked against SDKs before macOS 26 got these scaled down to the standard 32pt toolbar
+// size by AppKit; with the macOS 26+ SDK the toolbar uses the image's own size instead, which
+// makes the icons enormous. Constrain every toolbar item image to 32x32pt here, in one place,
+// so it applies to all toolbars (browser, viewers, 3D windows and plugins).
+
+static const CGFloat N2ToolbarItemImageMaxSize = 32;
+
+static IMP N2ToolbarItemOriginalSetImage = NULL;
+
+static void N2ToolbarItemSetImage(id self, SEL _cmd, NSImage *image)
+{
+    if (image && (image.size.width > N2ToolbarItemImageMaxSize || image.size.height > N2ToolbarItemImageMaxSize))
+    {
+        NSSize size = image.size;
+        CGFloat scale = N2ToolbarItemImageMaxSize / MAX(size.width, size.height);
+        image = [[image copy] autorelease]; // don't resize shared [NSImage imageNamed:] instances
+        image.size = NSMakeSize(round(size.width * scale), round(size.height * scale));
+    }
+    
+    ((void (*)(id, SEL, NSImage *))N2ToolbarItemOriginalSetImage)(self, _cmd, image);
+}
+
+@implementation NSToolbarItem (N2ImageSize)
+
++ (void)load
+{
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        Method m = class_getInstanceMethod([NSToolbarItem class], @selector(setImage:));
+        N2ToolbarItemOriginalSetImage = method_setImplementation(m, (IMP)N2ToolbarItemSetImage);
+    });
 }
 
 @end

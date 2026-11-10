@@ -7375,7 +7375,7 @@ public:
         {
             int i;
             
-            NSRect size = [self bounds];
+            NSRect size = [self convertRectToBacking: [self bounds]]; // Retina: read the full backing store, not just the bottom-left quarter
             
             *width = (long) size.size.width;
             *width/=4;
