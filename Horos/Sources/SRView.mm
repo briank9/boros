@@ -277,24 +277,65 @@ typedef struct _xyzArray
 //	}
 //}
 
+// Rotation movie / DICOM sequence export.
+// Every frame is placed relative to the camera saved when the export started, instead of
+// rotating further from wherever the camera currently is. This makes frame 0 the view the
+// user set up, keeps the rotation from drifting, and puts the camera back afterwards
+// (also when the export is cancelled).
+- (void) saveCameraForMovieExport
+{
+	if( movieExportCamera == nil)
+		movieExportCamera = vtkCamera::New();
+	movieExportCamera->DeepCopy( aCamera);
+}
+
+- (void) positionCameraForMovieFrame:(long) frame of:(long) total
+{
+	if( total <= 0)
+		return;
+	
+	float step = rotationValue / (float) total;
+	
+	if( movieExportCamera == nil) // no saved camera: one step from the current position (previous behaviour)
+	{
+		if( rotationOrientation == 1) [self Vertical: step];
+		else [self Azimuth: step];
+		return;
+	}
+	
+	aCamera->DeepCopy( movieExportCamera);
+	
+	if( rotationOrientation == 1)
+	{
+		// Elevation() does not turn the view-up vector, so a single large elevation breaks down
+		// near 90 degrees. Replay the same small steps the interactive rotation uses.
+		for( long i = 0; i < frame; i++)
+			[self Vertical: step];
+	}
+	else
+		[self Azimuth: step * (float) frame];
+	
+	aRenderer->ResetCameraClippingRange();
+}
+
+- (void) restoreCameraAfterMovieExport
+{
+	if( movieExportCamera == nil)
+		return;
+	
+	aCamera->DeepCopy( movieExportCamera);
+	movieExportCamera->Delete();
+	movieExportCamera = nil;
+	
+	aRenderer->ResetCameraClippingRange();
+	[self setNeedsDisplay: YES];
+}
+
 -(NSImage*) imageForFrame:(NSNumber*) cur maxFrame:(NSNumber*) max
 {
-//	if( [cur intValue] != -1) [self Azimuth: [self rotation] / [max floatValue]];
-//	return [self nsimageQuicktime];
-
 	if( [cur intValue] != -1)
-	{
-		switch( rotationOrientation)
-		{
-			case 0:
-				[self Azimuth: [self rotation] / [max floatValue]];
-			break;
-		
-			case 1:
-				[self Vertical: [self rotation] / [max floatValue]];
-			break;
-		}
-	}
+		[self positionCameraForMovieFrame: [cur longValue] of: [max longValue]];
+	
 	return [self nsimageQuicktime];
 }
 
@@ -343,11 +384,15 @@ typedef struct _xyzArray
 	{
 		[self setViewSizeToMatrix3DExport];
 		
+		[self saveCameraForMovieExport];
+		
 		QuicktimeExport *mov = [[QuicktimeExport alloc] initWithSelector: self : @selector(imageForFrame: maxFrame:) :numberOfFrames];
 		
 		[mov createMovieQTKit: YES  :NO  :[[[[[self window] windowController] fileList] objectAtIndex:0] valueForKeyPath:@"series.study.name"]];
 		
 		[mov release];
+		
+		[self restoreCameraAfterMovieExport];
 		
 		[self restoreViewSizeAfterMatrix3DExport];
 	}
@@ -644,6 +689,7 @@ typedef struct _xyzArray
 			}
 			
 			aRenderer->RemoveActor(textX);
+			[self saveCameraForMovieExport];
 			[self display];
 			for( i = 0; i < numberOfFrames; i++)
 			{
@@ -673,21 +719,14 @@ typedef struct _xyzArray
 					free( dataPtr);
 				}
 				
-				switch( rotationOrientation)
-				{
-					case 0:
-						[self Azimuth: (float) rotationValue / (float) numberOfFrames];
-					break;
-					
-					case 1:
-						[self Vertical: (float) rotationValue / (float) numberOfFrames];
-					break;
-				}
+				[self positionCameraForMovieFrame: i+1 of: numberOfFrames];
 				[self display];
 				[progress incrementBy: 1];
 				
 				[pool release];
 			}
+			
+			[self restoreCameraAfterMovieExport];
 			
 			if( wasPresent)
 				aRenderer->AddActor(outlineRect);

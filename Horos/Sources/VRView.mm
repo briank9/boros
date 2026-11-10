@@ -1222,18 +1222,63 @@ public:
     return [self nsimageQuicktime];
 }
 
+// Rotation movie / DICOM sequence export.
+// Every frame is placed relative to the camera saved when the export started, instead of
+// rotating further from wherever the camera currently is. This makes frame 0 the view the
+// user set up, keeps the rotation from drifting, and puts the camera back afterwards
+// (also when the export is cancelled).
+- (void) saveCameraForMovieExport
+{
+    if( movieExportCamera == nil)
+        movieExportCamera = vtkCamera::New();
+    movieExportCamera->DeepCopy( aCamera);
+}
+
+- (void) positionCameraForMovieFrame:(long) frame of:(long) total
+{
+    if( total <= 0)
+        return;
+    
+    float step = rotationValue / (float) total;
+    
+    if( movieExportCamera == nil) // no saved camera: one step from the current position (previous behaviour)
+    {
+        if( rotationOrientation == 1) [self Vertical: step];
+        else [self Azimuth: step];
+        return;
+    }
+    
+    aCamera->DeepCopy( movieExportCamera);
+    
+    if( rotationOrientation == 1)
+    {
+        // Elevation() does not turn the view-up vector, so a single large elevation breaks down
+        // near 90 degrees. Replay the same small steps the interactive rotation uses.
+        for( long i = 0; i < frame; i++)
+            [self Vertical: step];
+    }
+    else
+        [self Azimuth: step * (float) frame];
+    
+    aRenderer->ResetCameraClippingRange();
+}
+
+- (void) restoreCameraAfterMovieExport
+{
+    if( movieExportCamera == nil)
+        return;
+    
+    aCamera->DeepCopy( movieExportCamera);
+    movieExportCamera->Delete();
+    movieExportCamera = nil;
+    
+    aRenderer->ResetCameraClippingRange();
+    [self setNeedsDisplay: YES];
+}
+
 -(NSImage*) imageForFrame:(NSNumber*) cur maxFrame:(NSNumber*) max
 {
-    switch( rotationOrientation)
-    {
-        case 0:
-            [self Azimuth: [self rotation] / [max floatValue]];
-            break;
-            
-        case 1:
-            [self Vertical: [self rotation] / [max floatValue]];
-            break;
-    }
+    [self positionCameraForMovieFrame: [cur longValue] of: [max longValue]];
     
     if( [[[self window] windowController] movieFrames] > 1)
     {
@@ -1504,6 +1549,8 @@ public:
             if( textX)
                 aRenderer->RemoveActor(textX);
             
+            [self saveCameraForMovieExport];
+            
             for( int i = 0; i < numberOfFrames; i++)
             {
                 if( [[[self window] windowController] movieFrames] > 1)
@@ -1523,17 +1570,10 @@ public:
                 if( [progress aborted])
                     break;
                 
-                switch( rotationOrientation)
-                {
-                    case 0:
-                        [self Azimuth: (float) rotationValue / (float) numberOfFrames];
-                        break;
-                        
-                    case 1:
-                        [self Vertical: (float) rotationValue / (float) numberOfFrames];
-                        break;
-                }
+                [self positionCameraForMovieFrame: i+1 of: numberOfFrames];
             }
+            
+            [self restoreCameraAfterMovieExport];
             
             [self endRenderImageWithBestQuality];
             
@@ -1595,11 +1635,15 @@ public:
         
         [self setViewSizeToMatrix3DExport];
         
+        [self saveCameraForMovieExport];
+        
         QuicktimeExport *mov = [[QuicktimeExport alloc] initWithSelector: self : @selector(imageForFrame: maxFrame:) :numberOfFrames];
         
         [mov createMovieQTKit:YES :NO :[[[controller fileList] objectAtIndex:0] valueForKeyPath:@"series.study.name"]];
         
         [mov release];
+        
+        [self restoreCameraAfterMovieExport];
         
         [self restoreViewSizeAfterMatrix3DExport];
     }

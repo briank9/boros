@@ -293,6 +293,7 @@ typedef char* VTKStereoVRView;
 	
     vtkRenderer				*aRenderer;
     vtkCamera				*aCamera;
+    vtkCamera				*movieExportCamera;
 
     vtkActor				*outlineRect;
     vtkPolyDataMapper		*mapOutline;
