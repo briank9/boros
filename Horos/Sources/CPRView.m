@@ -409,6 +409,9 @@
 - (void)setDisplayTransverseLines:(BOOL)displayTransverseLines
 {
     _straightenedView.displayTransverseLines = displayTransverseLines;
+    _stretchedView.displayTransverseLines = displayTransverseLines;
+    [_straightenedView setNeedsDisplay:YES];
+    [_stretchedView setNeedsDisplay:YES];
 }
 
 - (BOOL)displayCrossLines

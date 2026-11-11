@@ -2689,6 +2689,7 @@ static float deg2rad = M_PI / 180.0;
 		
 		BOOL copyDisplayCrossLines = cprView.displayCrossLines;
 		BOOL copyDisplayMousePosition = self.displayMousePosition;
+		BOOL copyDisplayTransverseLines = cprView.displayTransverseLines;
 		
 		cprView.displayInfo = [[[CPRDisplayInfo alloc] init] autorelease];;
 		cprView.displayCrossLines = NO;
@@ -3150,7 +3151,7 @@ static float deg2rad = M_PI / 180.0;
 		cprView.displayCrossLines = copyDisplayCrossLines;
         cprView.displayInfo = displayInfo;
 		self.displayMousePosition = copyDisplayMousePosition;
-		cprView.displayTransverseLines = YES;
+		cprView.displayTransverseLines = copyDisplayTransverseLines;
         
     }
     //		else
@@ -4036,6 +4037,19 @@ static float deg2rad = M_PI / 180.0;
 		[toolbarItem setTarget:self];
 		[toolbarItem setAction:@selector(toogleCPRAxisVisibility:)];
     }
+    else if ([itemIdent isEqualToString:@"CPRCrossSectionsShowHide"])
+	{
+		[toolbarItem setPaletteLabel:NSLocalizedString(@"Cross-sections",nil)];
+		[toolbarItem setLabel:NSLocalizedString(@"Cross-sections",nil)];
+		[toolbarItem setToolTip:NSLocalizedString(@"Show or hide the cross-section (A/B/C) lines on the curved view",nil)];
+		if( !cprView.displayTransverseLines)
+			[toolbarItem setImage:[NSImage imageNamed:@"MPRAxisHide"]];
+		else
+			[toolbarItem setImage:[NSImage imageNamed:@"MPRAxisShow"]];
+		
+		[toolbarItem setTarget:self];
+		[toolbarItem setAction:@selector(toggleCPRCrossSectionLines:)];
+    }
 	else if ([itemIdent isEqualToString:@"MousePositionShowHide"])
 	{
 		[toolbarItem setPaletteLabel:NSLocalizedString(@"Mouse Position",nil)];
@@ -4078,7 +4092,7 @@ static float deg2rad = M_PI / 180.0;
 
 - (NSArray *) toolbarDefaultItemIdentifiers: (NSToolbar *) toolbar
 {
-    return [NSArray arrayWithObjects: @"tbTools", @"tbWLWW", @"tbLOD", @"tbStraightenedCPRAngle", @"tbCPRType", @"tbHighRes", @"tbPathAssistant", @"testDelNode", @"tbCPRPathMode", @"tbViewsPosition", @"tbThickSlab", NSToolbarFlexibleSpaceItemIdentifier, @"Reset.pdf", @"Export.icns", @"curvedPath.icns", @"BestRendering.pdf", @"AxisShowHide", @"CPRAxisShowHide", @"MousePositionShowHide", @"syncZoomLevel", nil];
+    return [NSArray arrayWithObjects: @"tbTools", @"tbWLWW", @"tbLOD", @"tbStraightenedCPRAngle", @"tbCPRType", @"tbHighRes", @"tbPathAssistant", @"testDelNode", @"tbCPRPathMode", @"tbViewsPosition", @"tbThickSlab", NSToolbarFlexibleSpaceItemIdentifier, @"Reset.pdf", @"Export.icns", @"curvedPath.icns", @"BestRendering.pdf", @"AxisShowHide", @"CPRAxisShowHide", @"CPRCrossSectionsShowHide", @"MousePositionShowHide", @"syncZoomLevel", nil];
 }
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar
@@ -4087,7 +4101,7 @@ static float deg2rad = M_PI / 180.0;
             NSToolbarFlexibleSpaceItemIdentifier,
             NSToolbarSpaceItemIdentifier,
             NSToolbarSeparatorItemIdentifier,
-            @"tbTools", @"tbWLWW", @"tbLOD", @"tbStraightenedCPRAngle", @"tbCPRType", @"tbHighRes", @"tbPathAssistant", @"tbCPRPathMode", @"tbViewsPosition", @"tbThickSlab", @"Reset.pdf", @"Export.icns", @"curvedPath.icns", @"BestRendering.pdf", @"AxisColors", @"AxisShowHide", @"CPRAxisShowHide", @"MousePositionShowHide", @"syncZoomLevel", @"tbInterpolationMode", nil];
+            @"tbTools", @"tbWLWW", @"tbLOD", @"tbStraightenedCPRAngle", @"tbCPRType", @"tbHighRes", @"tbPathAssistant", @"tbCPRPathMode", @"tbViewsPosition", @"tbThickSlab", @"Reset.pdf", @"Export.icns", @"curvedPath.icns", @"BestRendering.pdf", @"AxisColors", @"AxisShowHide", @"CPRAxisShowHide", @"CPRCrossSectionsShowHide", @"MousePositionShowHide", @"syncZoomLevel", @"tbInterpolationMode", nil];
     
     for (id key in [PluginManager plugins])
     {
@@ -4157,6 +4171,13 @@ static float deg2rad = M_PI / 180.0;
 			else
 				[item setImage:[NSImage imageNamed:@"MPRAxisShow"]];
 		}
+        else if([[item itemIdentifier] isEqualToString:@"CPRCrossSectionsShowHide"])
+		{
+			if( !cprView.displayTransverseLines)
+				[item setImage:[NSImage imageNamed:@"MPRAxisHide"]];
+			else
+				[item setImage:[NSImage imageNamed:@"MPRAxisShow"]];
+		}
 		else if([[item itemIdentifier] isEqualToString:@"MousePositionShowHide"])
 		{
 			if( !self.displayMousePosition)
@@ -4168,6 +4189,13 @@ static float deg2rad = M_PI / 180.0;
 }
 
 #pragma mark Axis / Mouse Position : Show / Hide
+
+- (void)toggleCPRCrossSectionLines:(id) sender
+{
+    cprView.displayTransverseLines = !cprView.displayTransverseLines;
+	[cprView setNeedsDisplay: YES];
+	[self updateToolbarItems];
+}
 
 - (void)toogleCPRAxisVisibility:(id) sender;
 {

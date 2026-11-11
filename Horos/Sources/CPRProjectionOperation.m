@@ -126,7 +126,14 @@
 					const float muWater = 0.0195f; // 1/mm, water at typical dental X-ray energies (~70 keV)
 					CGFloat m33 = _volumeData.volumeTransform.m33; // the slab volume transform scales z by 1/sampleDistance
 					float sampleDistance = (m33 != 0.0) ? (float)(1.0 / fabs(m33)) : 1.0f; // mm between slab samples
-					float k = muWater / 1000.0f * sampleDistance; // (HU + 1000) * k = mu * ds
+					// Overall absorption strength (1.0 = physical water attenuation). Lower values give a darker, less
+					// saturated image; tunable with: defaults write org.horosproject.horos CPRRadiographStrength -float 0.6
+					float strength = 0.75f;
+					if ([[NSUserDefaults standardUserDefaults] objectForKey:@"CPRRadiographStrength"]) {
+						strength = [[NSUserDefaults standardUserDefaults] floatForKey:@"CPRRadiographStrength"];
+						if (strength <= 0.0f) strength = 0.75f;
+					}
+					float k = strength * muWater / 1000.0f * sampleDistance; // (HU + 1000) * k = mu * ds (scaled)
 					float airHU = -1000.0f, plus1000 = 1000.0f;
 					float *slice = malloc(sizeof(float) * pixelsPerPlane);
 					
