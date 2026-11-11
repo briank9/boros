@@ -2662,6 +2662,27 @@ static float deg2rad = M_PI / 180.0;
     return NO;
 }
 
+// applyDisplayedSlabToExportRequest:
+// Copies the curved view's current display settings into a CPR export request:
+//   - slabWidth:          slab thickness in mm (curvedPath.thickness; 0 = thin slice)
+//   - projectionMode:     how the slab is collapsed into one image (MIP, MinIP, Mean or Radiograph),
+//                         taken from the on-screen clipping range mode (the enum values line up)
+//   - interpolationMode:  same pixel interpolation the screen uses
+// Used by every 16-bit DICOM export path so the exported panorex/curved image matches what is displayed.
+- (void)applyDisplayedSlabToExportRequest:(CPRGeneratorRequest *)request
+{
+    request.slabWidth = curvedPath.thickness;
+    request.slabSampleDistance = 0;
+    request.interpolationMode = [self selectedInterpolationMode];
+    
+    CPRProjectionMode mode = (CPRProjectionMode) cprView.clippingRangeMode;
+    
+    if ([request isKindOfClass:[CPRStraightenedGeneratorRequest class]])
+        ((CPRStraightenedGeneratorRequest *)request).projectionMode = mode;
+    else if ([request isKindOfClass:[CPRStretchedGeneratorRequest class]])
+        ((CPRStretchedGeneratorRequest *)request).projectionMode = mode;
+}
+
 -(IBAction) endDCMExportSettings:(id) sender
 {
     NSUInteger exportWidth;
@@ -2809,6 +2830,9 @@ static float deg2rad = M_PI / 180.0;
                     requestStraightened.pixelsHigh = exportHeight;
                     requestStraightened.bezierPath = curvedPath.bezierPath;
                     requestStraightened.initialNormal = curvedPath.initialNormal;    
+                    // Bug fix: previously this export ignored the slab thickness and mode (e.g. radiograph)
+                    // and produced a thin single slice. Copy the on-screen slab settings so the export matches the display.
+                    [self applyDisplayedSlabToExportRequest: requestStraightened];
                     
                     curvedVolumeData = [CPRGenerator synchronousRequestVolume: requestStraightened volumeData:cprView.volumeData];                            
                 }
@@ -2818,6 +2842,9 @@ static float deg2rad = M_PI / 180.0;
                     requestStretched.pixelsWide = exportWidth;
                     requestStretched.pixelsHigh = exportHeight;
                     requestStretched.bezierPath = curvedPath.bezierPath;
+                    // Bug fix: previously this export ignored the slab thickness and mode (e.g. radiograph)
+                    // and produced a thin single slice. Copy the on-screen slab settings so the export matches the display.
+                    [self applyDisplayedSlabToExportRequest: requestStretched];
                     
                     N3Vector curveDirection = N3VectorSubtract([ curvedPath.bezierPath vectorAtEnd], [ curvedPath.bezierPath vectorAtStart]);
                     N3Vector baseNormalVector = N3VectorNormalize(N3VectorCrossProduct( curvedPath.baseDirection, curveDirection));
@@ -2884,6 +2911,9 @@ static float deg2rad = M_PI / 180.0;
                     requestStraightened.pixelsHigh = exportHeight;
                     requestStraightened.bezierPath = curvedPath.bezierPath;
                     requestStraightened.initialNormal = curvedPath.initialNormal;
+                    // Bug fix: previously this export ignored the slab thickness and mode (e.g. radiograph)
+                    // and produced a thin single slice. Copy the on-screen slab settings so the export matches the display.
+                    [self applyDisplayedSlabToExportRequest: requestStraightened];
                 }
                 else
                 {
@@ -2891,6 +2921,9 @@ static float deg2rad = M_PI / 180.0;
                     requestStretched.pixelsWide = exportWidth;
                     requestStretched.pixelsHigh = exportHeight;
                     requestStretched.bezierPath = curvedPath.bezierPath;
+                    // Bug fix: previously this export ignored the slab thickness and mode (e.g. radiograph)
+                    // and produced a thin single slice. Copy the on-screen slab settings so the export matches the display.
+                    [self applyDisplayedSlabToExportRequest: requestStretched];
                     
                     N3Vector curveDirection = N3VectorSubtract([ curvedPath.bezierPath vectorAtEnd], [ curvedPath.bezierPath vectorAtStart]);
                     N3Vector baseNormalVector = N3VectorNormalize(N3VectorCrossProduct( curvedPath.baseDirection, curveDirection));
@@ -4633,6 +4666,27 @@ static float deg2rad = M_PI / 180.0;
     }
 }
 
+// Fraction of a column's height given to the TOP view of each column.
+// Left column:  top = sagittal (mprView1),  bottom = axial (mprView2).
+// Right column: top = coronal  (mprView3),  bottom = panorex + cross-sections (cprView cluster).
+// The axial and the panorex are the views used most for dental planning, so they get the larger share.
+// Can be tuned with: defaults write org.horosproject.horos CPRTopViewFraction -float 0.35
+static CGFloat CPRTopViewFraction(void)
+{
+    CGFloat fraction = 0.35;
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"CPRTopViewFraction"])
+        fraction = [[NSUserDefaults standardUserDefaults] floatForKey:@"CPRTopViewFraction"];
+    return MIN(MAX(fraction, 0.1), 0.9); // keep both views visible
+}
+
+// Moves a split view's single divider so the top subview gets `fraction` of the available height.
+static void CPRSetSplitTopFraction(NSSplitView *split, CGFloat fraction)
+{
+    CGFloat minPos = [split minPossiblePositionOfDividerAtIndex:0];
+    CGFloat maxPos = [split maxPossiblePositionOfDividerAtIndex:0];
+    [split setPosition:minPos + (maxPos - minPos) * fraction ofDividerAtIndex:0];
+}
+
 - (void)setViewsPosition:(ViewsPosition) newViewsPosition
 {
     NSDisableScreenUpdates();
@@ -4643,7 +4697,10 @@ static float deg2rad = M_PI / 180.0;
     {
         case NormalPosition:
             [verticalSplit setPosition:([verticalSplit minPossiblePositionOfDividerAtIndex:0]+[verticalSplit maxPossiblePositionOfDividerAtIndex:0])/2 ofDividerAtIndex:0];
-            [horizontalSplit2 setPosition:([horizontalSplit2 minPossiblePositionOfDividerAtIndex:0]+[horizontalSplit2 maxPossiblePositionOfDividerAtIndex:0])/2 ofDividerAtIndex:0];
+            // Make the axial (bottom-left) and the panorex (bottom-right) the large views,
+            // with the sagittal and coronal smaller above them (was: right column 50/50, left column unset).
+            CPRSetSplitTopFraction(horizontalSplit1, CPRTopViewFraction());
+            CPRSetSplitTopFraction(horizontalSplit2, CPRTopViewFraction());
             cprView.rotation = 0;
         break;
         
@@ -4725,6 +4782,9 @@ static float deg2rad = M_PI / 180.0;
     request.pixelsHigh = height;
     request.bezierPath = curvedPath.bezierPath;
     request.initialNormal = curvedPath.initialNormal;    
+    // Bug fix: previously this export ignored the slab thickness and mode (e.g. radiograph)
+    // and produced a thin single slice. Copy the on-screen slab settings so the export matches the display.
+    [self applyDisplayedSlabToExportRequest: request];
     
     curvedVolumeData = [CPRGenerator synchronousRequestVolume:request volumeData:cprView.volumeData];
     imageRep = [curvedVolumeData unsignedInt16ImageRepForSliceAtIndex:0];
