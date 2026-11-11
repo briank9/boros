@@ -39,6 +39,48 @@
 
 #import "CPRController.h"
 #import "CPRClusterView.h"
+
+// Toolbar icon for the cross-section lines: the axis icon recolored to match the curved view
+// (yellow vertical bar = cross-section lines, green horizontal bar), gray when hidden.
+static NSImage *CPRCrossSectionsToolbarImage(BOOL shown)
+{
+    static NSImage *shownImage = nil;
+    
+    if (shown == NO)
+        return [NSImage imageNamed:@"MPRAxisHide"];
+    
+    if (shownImage == nil)
+    {
+        NSImage *source = [NSImage imageNamed:@"MPRAxisShow"];
+        NSBitmapImageRep *rep = [[[NSBitmapImageRep alloc] initWithData:[source TIFFRepresentation]] autorelease];
+        NSBitmapImageRep *out = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:rep.pixelsWide pixelsHigh:rep.pixelsHigh bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
+        
+        for (NSInteger y = 0; y < rep.pixelsHigh; y++)
+        {
+            for (NSInteger x = 0; x < rep.pixelsWide; x++)
+            {
+                NSColor *original = [rep colorAtX:x y:y];
+                NSColor *c = [original colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
+                if (c == nil) { // not convertible (should not happen for this icon): keep the pixel as it is
+                    if (original) [out setColor:original atX:x y:y];
+                    continue;
+                }
+                CGFloat r = c.redComponent, g = c.greenComponent, b = c.blueComponent, a = c.alphaComponent;
+                
+                if (r > g + 0.15 && b > g + 0.15)           // magenta vertical bar -> yellow
+                    c = [NSColor colorWithDeviceRed:r green:b blue:g alpha:a];
+                else if (b > r + 0.15)                       // blue horizontal bar -> green
+                    c = [NSColor colorWithDeviceRed:r green:b blue:r alpha:a];
+                
+                [out setColor:c atX:x y:y];
+            }
+        }
+        
+        shownImage = [[NSImage alloc] initWithSize:source.size];
+        [shownImage addRepresentation:out];
+    }
+    return shownImage;
+}
 #import "BrowserController.h"
 #import "Wait.h"
 #import "DICOMExport.h"
@@ -4043,10 +4085,7 @@ static float deg2rad = M_PI / 180.0;
 		[toolbarItem setPaletteLabel:NSLocalizedString(@"Cross-sections",nil)];
 		[toolbarItem setLabel:NSLocalizedString(@"Cross-sections",nil)];
 		[toolbarItem setToolTip:NSLocalizedString(@"Show or hide the cross-section (A/B/C) lines on the curved view",nil)];
-		if( !cprView.displayTransverseLines)
-			[toolbarItem setImage:[NSImage imageNamed:@"MPRAxisHide"]];
-		else
-			[toolbarItem setImage:[NSImage imageNamed:@"MPRAxisShow"]];
+		[toolbarItem setImage:CPRCrossSectionsToolbarImage(cprView.displayTransverseLines)];
 		
 		[toolbarItem setTarget:self];
 		[toolbarItem setAction:@selector(toggleCPRCrossSectionLines:)];
@@ -4174,10 +4213,7 @@ static float deg2rad = M_PI / 180.0;
 		}
         else if([[item itemIdentifier] isEqualToString:@"CPRCrossSectionsShowHide"])
 		{
-			if( !cprView.displayTransverseLines)
-				[item setImage:[NSImage imageNamed:@"MPRAxisHide"]];
-			else
-				[item setImage:[NSImage imageNamed:@"MPRAxisShow"]];
+			[item setImage:CPRCrossSectionsToolbarImage(cprView.displayTransverseLines)];
 		}
 		else if([[item itemIdentifier] isEqualToString:@"MousePositionShowHide"])
 		{
