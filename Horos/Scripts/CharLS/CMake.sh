@@ -36,6 +36,7 @@ export CXX=clang
 
 args=("$PROJECT_DIR/$TARGET_NAME")
 args+=(-DCMAKE_POLICY_VERSION_MINIMUM=3.5)
+[ "$CONFIGURATION" == 'Release' ] && args+=( -DCMAKE_BUILD_TYPE=Release ) # optimize (-O3) in Release; without a build type CMake compiles with no optimization
 cxxfs=($OTHER_CPLUSPLUSFLAGS)
 ldfs=($OTHER_LDFLAGS)
 

@@ -54,6 +54,7 @@ args+=(-DBUILD_TESTING=OFF)
 args+=(-DBUILD_CODEC=OFF) # only libopenjp2 is needed; the codec tools pull in thirdparty libs that no longer build with current SDKs
 args+=(-DBUILD_THIRDPARTY=ON)
 args+=(-DCMAKE_POLICY_VERSION_MINIMUM=3.5)
+[ "$CONFIGURATION" == 'Release' ] && args+=( -DCMAKE_BUILD_TYPE=Release ) # optimize (-O3) in Release; without a build type CMake compiles with no optimization
 
 args+=(-DCMAKE_PREFIX_PATH="/opt/homebrew")
 args+=(-DCMAKE_LIBRARY_PATH="/opt/homebrew/lib")
