@@ -286,6 +286,31 @@ public:
 
 
 @implementation VRView
+{
+    // YES once VTK's OpenGL function pointers have been loaded for this view's render window.
+    BOOL _vtkOpenGLFunctionsLoaded;
+}
+
+// ensureVTKOpenGLReady
+// VTK loads its OpenGL function pointers (glewInit) the first time its render window renders normally.
+// -render and -renderBlendedVolume call the volume mapper directly, bypassing that step. If the first
+// 3D draw after launching Boros goes through them (e.g. opening the curved MPR window before any other
+// 3D window), the mapper calls a not-yet-loaded (NULL) OpenGL function and the app crashes.
+// This makes sure the GL context exists and VTK's OpenGL setup has run before the mapper is used.
+// Returns NO if there is no GL context yet (view not ready), in which case the caller should skip drawing.
+- (BOOL) ensureVTKOpenGLReady
+{
+    if( _cocoaRenderWindow == NULL || _cocoaRenderWindow->GetContextId() == NULL)
+        return NO;
+    
+    if( _vtkOpenGLFunctionsLoaded == NO)
+    {
+        _cocoaRenderWindow->MakeCurrent();
+        _cocoaRenderWindow->OpenGLInit(); // runs glewInit once per render window, then sets VTK's default GL state
+        _vtkOpenGLFunctionsLoaded = YES;
+    }
+    return YES;
+}
 
 #ifdef _STEREO_VISION_
 //added SilvanWidmer
@@ -2262,7 +2287,8 @@ public:
 
 - (void) render
 {
-    if( volumeMapper)
+    // Skip this draw if the OpenGL context isn't ready yet (avoids a crash on first open); the view redraws later.
+    if( volumeMapper && [self ensureVTKOpenGLReady])
     {
         aRenderer->SetDraw( 0);
         
@@ -2279,7 +2305,8 @@ public:
 
 - (void) renderBlendedVolume
 {
-    if( blendingVolumeMapper)
+    // Skip this draw if the OpenGL context isn't ready yet (avoids a crash on first open); the view redraws later.
+    if( blendingVolumeMapper && [self ensureVTKOpenGLReady])
     {
         aRenderer->SetDraw( 0);
         
