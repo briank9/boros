@@ -60,8 +60,10 @@ extern const int32_t CPRCurvedPathControlTokenNone;
     N3Vector _baseDirection;
     CGFloat _angle;
     CGFloat _thickness;
-    CGFloat _transverseSectionSpacing;
+    CGFloat _transverseSectionSpacing; // unused since the A/C lines can move independently, kept for ABI compatibility
     CGFloat _transverseSectionPosition;
+    CGFloat _leftTransverseSectionOffset; // mm along the curve from the center (B) line to the left (A) line, usually negative
+    CGFloat _rightTransverseSectionOffset; // mm along the curve from the center (B) line to the right (C) line, usually positive
 }
 
 + (BOOL)controlTokenIsNode:(CPRCurvedPathControlToken)token;
@@ -96,10 +98,15 @@ extern const int32_t CPRCurvedPathControlTokenNone;
 @property (nonatomic, readwrite, assign) N3Vector baseDirection; // a base direction from which to define things such as the initial normal
 @property (nonatomic, readwrite, assign) CGFloat angle;
 @property (nonatomic, readwrite, assign) N3Vector initialNormal;
-@property (nonatomic, readwrite, assign) CGFloat transverseSectionSpacing; // in mm
+// The three cross-section (transverse) lines: A = left, B = center, C = right.
+// Setting transverseSectionPosition moves all three together (A and C keep their distance to B);
+// setting transverseSectionSpacing places A and C symmetrically around B. To move a single line, use
+// the left/right setters or setCenterTransverseSectionPositionOnly:. The lines may cross each other.
+@property (nonatomic, readwrite, assign) CGFloat transverseSectionSpacing; // in mm, half the distance between A and C
 @property (nonatomic, readwrite, assign) CGFloat transverseSectionPosition; // as a relative position [0, 1] pass -1 if you don't want the trasvers section to appear
-@property (nonatomic, readonly, assign) CGFloat leftTransverseSectionPosition;
-@property (nonatomic, readonly, assign) CGFloat rightTransverseSectionPosition;
+@property (nonatomic, readwrite, assign) CGFloat leftTransverseSectionPosition; // relative position [0, 1] of the A line; setting it moves only A
+@property (nonatomic, readwrite, assign) CGFloat rightTransverseSectionPosition; // relative position [0, 1] of the C line; setting it moves only C
+- (void)setCenterTransverseSectionPositionOnly:(CGFloat)position; // moves only the B line, A and C stay where they are
 @property (readonly, copy) NSArray* nodes; // N3Vectors stored in NSValues
 
 - (N3Vector)stretchedProjectionNormal;

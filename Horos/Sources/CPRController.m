@@ -38,6 +38,7 @@
 #import "options.h"
 
 #import "CPRController.h"
+#import "CPRClusterView.h"
 #import "BrowserController.h"
 #import "Wait.h"
 #import "DICOMExport.h"
@@ -4193,6 +4194,11 @@ static float deg2rad = M_PI / 180.0;
 - (void)toggleCPRCrossSectionLines:(id) sender
 {
     cprView.displayTransverseLines = !cprView.displayTransverseLines;
+    
+    // hide the A/B/C cross-section views together with their lines, the curved view takes the space
+    if ([[cprView superview] isKindOfClass:[CPRClusterView class]])
+        [(CPRClusterView *)[cprView superview] setSideViewsHidden:!cprView.displayTransverseLines];
+    
 	[cprView setNeedsDisplay: YES];
 	[self updateToolbarItems];
 }

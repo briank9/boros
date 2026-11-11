@@ -45,11 +45,13 @@
     NSView *_topView;
     NSView *_middleView;
     NSView *_bottomView;
+    BOOL _sideViewsHidden;
 }
 
 @property (nonatomic, readwrite, retain) IBOutlet NSView *mainView;
 @property (nonatomic, readwrite, retain) IBOutlet NSView *topView;
 @property (nonatomic, readwrite, retain) IBOutlet NSView *middleView;
 @property (nonatomic, readwrite, retain) IBOutlet NSView *bottomView;
+@property (nonatomic, readwrite, assign) BOOL sideViewsHidden; // hides the top/middle/bottom views and gives the main view the full width
 
 @end

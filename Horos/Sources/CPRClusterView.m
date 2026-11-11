@@ -51,6 +51,15 @@
 @synthesize topView = _topView;
 @synthesize middleView = _middleView;
 @synthesize bottomView = _bottomView;
+@synthesize sideViewsHidden = _sideViewsHidden;
+
+- (void)setSideViewsHidden:(BOOL)sideViewsHidden
+{
+    if (sideViewsHidden != _sideViewsHidden) {
+        _sideViewsHidden = sideViewsHidden;
+        [self _updateClusterViewFrames];
+    }
+}
 
 - (void)dealloc
 {
@@ -120,7 +129,13 @@
     rightViewHeight = floor(rightViewHeight);
     
     rightViewWidth = MIN(rightViewHeight, NSWidth(self.bounds));
+    if (_sideViewsHidden)
+        rightViewWidth = 0;
     rightViewX = NSWidth(self.bounds) - rightViewWidth;
+    
+    [_topView setHidden:_sideViewsHidden];
+    [_middleView setHidden:_sideViewsHidden];
+    [_bottomView setHidden:_sideViewsHidden];
     
     _bottomView.translatesAutoresizingMaskIntoConstraints = YES;
     _middleView.translatesAutoresizingMaskIntoConstraints = YES;

@@ -85,6 +85,9 @@
 
     BOOL _draggingTransverse;
     BOOL _draggingTransverseSpacing;
+    NSInteger _draggingTransverseLine; // which cross-section line is being dragged: 1 = A (left), 2 = B (center), 3 = C (right)
+    BOOL _draggingTransverseGroup; // option-drag: move all three lines together
+    CGFloat _transverseGroupGrabOffset; // B position minus the mouse position when the group drag started
     
     BOOL _isDraggingNode;
     NSInteger _draggedNode;

@@ -89,7 +89,6 @@ static CPRCurvedPathControlToken _controlTokenForElement(NSInteger element)
 @synthesize angle = _angle;
 @synthesize baseDirection = _baseDirection;
 @synthesize thickness = _thickness;
-@synthesize transverseSectionSpacing = _transverseSectionSpacing;
 @synthesize transverseSectionPosition = _transverseSectionPosition;
 
 + (BOOL)controlTokenIsNode:(CPRCurvedPathControlToken)token
@@ -115,6 +114,8 @@ static CPRCurvedPathControlToken _controlTokenForElement(NSInteger element)
         _nodeRelativePositions = [[NSMutableArray alloc] init];
         _transverseSectionPosition = 0.5;
         _transverseSectionSpacing = 2;
+        _leftTransverseSectionOffset = -2;
+        _rightTransverseSectionOffset = 2;
     }
     return self;
 }
@@ -158,6 +159,13 @@ static CPRCurvedPathControlToken _controlTokenForElement(NSInteger element)
 		_thickness = [decoder decodeDoubleForKey:@"thickness"];
 		_transverseSectionSpacing = [decoder decodeDoubleForKey:@"transverseSectionSpacing"];
 		_transverseSectionPosition = [decoder decodeDoubleForKey:@"transverseSectionPosition"];
+		if ([decoder containsValueForKey:@"leftTransverseSectionOffset"] && [decoder containsValueForKey:@"rightTransverseSectionOffset"]) {
+			_leftTransverseSectionOffset = [decoder decodeDoubleForKey:@"leftTransverseSectionOffset"];
+			_rightTransverseSectionOffset = [decoder decodeDoubleForKey:@"rightTransverseSectionOffset"];
+		} else { // saved before the lines could move independently: symmetric spacing
+			_leftTransverseSectionOffset = -fabs(_transverseSectionSpacing);
+			_rightTransverseSectionOffset = fabs(_transverseSectionSpacing);
+		}
 	}
 	return self;
 }
@@ -173,6 +181,8 @@ static CPRCurvedPathControlToken _controlTokenForElement(NSInteger element)
         _thickness = curvedPath.thickness;
         _transverseSectionSpacing = curvedPath.transverseSectionSpacing;
         _transverseSectionPosition = curvedPath.transverseSectionPosition;
+        _leftTransverseSectionOffset = curvedPath->_leftTransverseSectionOffset;
+        _rightTransverseSectionOffset = curvedPath->_rightTransverseSectionOffset;
     }
     return self;
 }
@@ -220,8 +230,10 @@ static CPRCurvedPathControlToken _controlTokenForElement(NSInteger element)
 	[encoder encodeObject:[(NSDictionary *)N3VectorCreateDictionaryRepresentation(_baseDirection) autorelease] forKey:@"baseDirectionDictionary"];
 	[encoder encodeDouble:_angle forKey:@"angle"];
 	[encoder encodeDouble:_thickness forKey:@"thickness"];
-	[encoder encodeDouble:_transverseSectionSpacing forKey:@"transverseSectionSpacing"];
+	[encoder encodeDouble:[self transverseSectionSpacing] forKey:@"transverseSectionSpacing"]; // still written so older versions can read the file
 	[encoder encodeDouble:_transverseSectionPosition forKey:@"transverseSectionPosition"];
+	[encoder encodeDouble:_leftTransverseSectionOffset forKey:@"leftTransverseSectionOffset"];
+	[encoder encodeDouble:_rightTransverseSectionOffset forKey:@"rightTransverseSectionOffset"];
 }
 
 - (void)setInitialNormal:(N3Vector)initialNormal
@@ -377,6 +389,8 @@ static CPRCurvedPathControlToken _controlTokenForElement(NSInteger element)
     _nodeRelativePositions = [[NSMutableArray alloc] init];
     _transverseSectionPosition = 0.5;
     _transverseSectionSpacing = 2;
+    _leftTransverseSectionOffset = -2;
+    _rightTransverseSectionOffset = 2;
 }
 
 - (void)moveControlToken:(CPRCurvedPathControlToken)token toPoint:(NSPoint)point transform:(N3AffineTransform)transform // resets Z by default
@@ -410,7 +424,7 @@ static CPRCurvedPathControlToken _controlTokenForElement(NSInteger element)
         _transverseSectionPosition = [self relativePositionForPoint:point transform:transform];
     } else if (token == CPRCurvedPathControlTokenTransverseSpacing) {
         relativePosition = [self relativePositionForPoint:point transform:transform];;
-        _transverseSectionSpacing = ABS(_transverseSectionPosition - relativePosition)*[_bezierPath length];
+        [self setTransverseSectionSpacing:ABS(_transverseSectionPosition - relativePosition)*[_bezierPath length]];
     }
 }
 
@@ -573,12 +587,54 @@ static CPRCurvedPathControlToken _controlTokenForElement(NSInteger element)
 
 - (CGFloat)leftTransverseSectionPosition
 {
-    return MAX(_transverseSectionPosition - _transverseSectionSpacing/[_bezierPath length], 0.0);
+    CGFloat length = [_bezierPath length];
+    if (length <= 0.0)
+        return _transverseSectionPosition;
+    return MIN(MAX(_transverseSectionPosition + _leftTransverseSectionOffset/length, 0.0), 1.0);
 }
 
 - (CGFloat)rightTransverseSectionPosition
 {
-    return MIN(_transverseSectionPosition + _transverseSectionSpacing/[_bezierPath length], 1.0);
+    CGFloat length = [_bezierPath length];
+    if (length <= 0.0)
+        return _transverseSectionPosition;
+    return MIN(MAX(_transverseSectionPosition + _rightTransverseSectionOffset/length, 0.0), 1.0);
+}
+
+- (void)setLeftTransverseSectionPosition:(CGFloat)position // moves only the A line
+{
+    position = MIN(MAX(position, 0.0), 1.0);
+    _leftTransverseSectionOffset = (position - _transverseSectionPosition) * [_bezierPath length];
+}
+
+- (void)setRightTransverseSectionPosition:(CGFloat)position // moves only the C line
+{
+    position = MIN(MAX(position, 0.0), 1.0);
+    _rightTransverseSectionOffset = (position - _transverseSectionPosition) * [_bezierPath length];
+}
+
+- (void)setCenterTransverseSectionPositionOnly:(CGFloat)position // moves only the B line
+{
+    CGFloat length = [_bezierPath length];
+    position = MIN(MAX(position, 0.0), 1.0);
+    // keep A and C at their current place along the curve
+    CGFloat leftMm = _transverseSectionPosition * length + _leftTransverseSectionOffset;
+    CGFloat rightMm = _transverseSectionPosition * length + _rightTransverseSectionOffset;
+    _transverseSectionPosition = position;
+    _leftTransverseSectionOffset = leftMm - position * length;
+    _rightTransverseSectionOffset = rightMm - position * length;
+}
+
+- (CGFloat)transverseSectionSpacing // half the distance between A and C, in mm
+{
+    return fabs(_rightTransverseSectionOffset - _leftTransverseSectionOffset) / 2.0;
+}
+
+- (void)setTransverseSectionSpacing:(CGFloat)spacing // places A and C symmetrically around B
+{
+    _transverseSectionSpacing = fabs(spacing);
+    _leftTransverseSectionOffset = -fabs(spacing);
+    _rightTransverseSectionOffset = fabs(spacing);
 }
 
 

@@ -920,16 +920,25 @@ extern int splitPosition[ 3];
 	if( [[self windowController] exportSequenceType] == CPRSeriesExportSequenceType && [[self windowController] exportSeriesType] == CPRTransverseViewsExportSeriesType)
 		exportTransverseSliceInterval = [[self windowController] exportTransverseSliceInterval];
 	
-    if( exportTransverseSliceInterval == 0 && _displayTransverseLines && (ABS((pixVector.x/pixWidth) - _curvedPath.transverseSectionPosition)*pixWidth < 5.0))
+    // Cross-section lines: each line (A, B, C) is dragged on its own; option-drag moves all three together.
+    CGFloat lineDistanceA = ABS((pixVector.x/pixWidth) - _curvedPath.leftTransverseSectionPosition)*pixWidth;
+    CGFloat lineDistanceB = ABS((pixVector.x/pixWidth) - _curvedPath.transverseSectionPosition)*pixWidth;
+    CGFloat lineDistanceC = ABS((pixVector.x/pixWidth) - _curvedPath.rightTransverseSectionPosition)*pixWidth;
+    
+    if( exportTransverseSliceInterval == 0 && _displayTransverseLines && MIN(lineDistanceB, MIN(lineDistanceA, lineDistanceC)) < 10.0)
 	{
+        if (lineDistanceB <= lineDistanceA && lineDistanceB <= lineDistanceC)
+            _draggingTransverseLine = 2;
+        else if (lineDistanceA <= lineDistanceC)
+            _draggingTransverseLine = 1;
+        else
+            _draggingTransverseLine = 3;
+        
+        _draggingTransverseGroup = ([event modifierFlags] & NSAlternateKeyMask) != 0;
+        _transverseGroupGrabOffset = _curvedPath.transverseSectionPosition - (pixVector.x/pixWidth);
+        
 		[self _sendWillEditCurvedPath];
         _draggingTransverse = YES;
-		[self mouseMoved: event];
-    }
-	else if( exportTransverseSliceInterval == 0 && _displayTransverseLines && ((ABS((pixVector.x/pixWidth) - _curvedPath.leftTransverseSectionPosition)*pixWidth < 10.0) ||  (ABS((pixVector.x/pixWidth) - _curvedPath.rightTransverseSectionPosition)*pixWidth < 10.0)))
-	{
-		[self _sendWillEditCurvedPath];
-        _draggingTransverseSpacing = YES;
 		[self mouseMoved: event];
     }
 	else
@@ -1042,7 +1051,16 @@ extern int splitPosition[ 3];
     if (_draggingTransverse)
 	{
         relativePosition = pixVector.x/pixWidth;
-        _curvedPath.transverseSectionPosition = MAX(MIN(relativePosition, 1.0), 0.0);
+        
+        if (_draggingTransverseGroup)
+            _curvedPath.transverseSectionPosition = MAX(MIN(relativePosition + _transverseGroupGrabOffset, 1.0), 0.0); // A and C follow B
+        else if (_draggingTransverseLine == 1)
+            _curvedPath.leftTransverseSectionPosition = relativePosition;
+        else if (_draggingTransverseLine == 3)
+            _curvedPath.rightTransverseSectionPosition = relativePosition;
+        else
+            [_curvedPath setCenterTransverseSectionPositionOnly:relativePosition];
+        
 		[self _sendDidUpdateCurvedPath];
 
 		[self _sendWillEditDisplayInfo];
