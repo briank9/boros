@@ -1438,6 +1438,9 @@ extern int splitPosition[ 3];
         case CPRViewClippingRangeMeanMode:
             return 1;
             break;
+        case CPRViewClippingRangeRadiographMode:
+            return 1; // already projected to a single plane by CPRProjectionOperation
+            break;
         default:
             NSLog(@"%s asking for invalid clipping range mode: %d", __func__, (int) clippingRangeMode);
             return 0;

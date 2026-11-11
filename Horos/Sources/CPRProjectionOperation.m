@@ -114,6 +114,42 @@
 						vDSP_vavlin((float *)CPRVolumeDataFloatBytes(&inlineBuffer) + (i * pixelsPerPlane), 1, &floati, floatBytes, 1, pixelsPerPlane);
 					}
 					break;
+				case CPRProjectionModeRadiograph:
+				{
+					// Simulated radiograph, like a panoramic X-ray (OPG) through the slab.
+					// CT values (HU) are converted to linear attenuation coefficients,
+					//     mu = muWater * (1 + HU/1000)   (HU below -1000 are treated as air),
+					// integrated along the slab depth, and passed through Beer-Lambert absorption,
+					//     absorbed = 1 - exp(-sum(mu * ds)).
+					// The result is mapped to an HU-like scale (-1000 = no absorption, 3000 = full absorption)
+					// so the window/level shared with the MPR views keeps working.
+					const float muWater = 0.0195f; // 1/mm, water at typical dental X-ray energies (~70 keV)
+					CGFloat m33 = _volumeData.volumeTransform.m33; // the slab volume transform scales z by 1/sampleDistance
+					float sampleDistance = (m33 != 0.0) ? (float)(1.0 / fabs(m33)) : 1.0f; // mm between slab samples
+					float k = muWater / 1000.0f * sampleDistance; // (HU + 1000) * k = mu * ds
+					float airHU = -1000.0f, plus1000 = 1000.0f;
+					float *slice = malloc(sizeof(float) * pixelsPerPlane);
+					
+					if (slice) {
+						vDSP_vclr(floatBytes, 1, pixelsPerPlane); // floatBytes accumulates sum(mu * ds)
+						for (i = 0; i < _volumeData.pixelsDeep; i++) {
+							if ([self isCancelled]) {
+								break;
+							}
+							vDSP_vthr((float *)CPRVolumeDataFloatBytes(&inlineBuffer) + (i * pixelsPerPlane), 1, &airHU, slice, 1, pixelsPerPlane); // clamp below air
+							vDSP_vsadd(slice, 1, &plus1000, slice, 1, pixelsPerPlane);
+							vDSP_vsma(slice, 1, &k, floatBytes, 1, floatBytes, 1, pixelsPerPlane); // sum += (HU + 1000) * k
+						}
+						free(slice);
+						
+						int n = (int)pixelsPerPlane;
+						float minus4000 = -4000.0f, plus3000 = 3000.0f;
+						vDSP_vneg(floatBytes, 1, floatBytes, 1, pixelsPerPlane);
+						vvexpf(floatBytes, floatBytes, &n); // transmitted fraction exp(-sum)
+						vDSP_vsmsa(floatBytes, 1, &minus4000, &plus3000, floatBytes, 1, pixelsPerPlane); // -1000 + 4000 * (1 - transmitted)
+					}
+					break;
+				}
 				default:
 					break;
 			}

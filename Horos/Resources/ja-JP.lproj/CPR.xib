@@ -993,6 +993,7 @@ Gw
                                     <menuItem title="MIP - Max Intensity Projection" state="on" tag="1" id="671"/>
                                     <menuItem title="minIP - Min Intensity Projection" tag="2" id="1147"/>
                                     <menuItem title="Mean" tag="3" id="669"/>
+                                    <menuItem title="Radiograph (Panoramic X-ray)" tag="4" id="RdG-Pn-X4y"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>

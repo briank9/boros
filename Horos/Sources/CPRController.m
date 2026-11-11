@@ -2037,7 +2037,7 @@ static float deg2rad = M_PI / 180.0;
 
 - (void)ApplyOpacityString:(NSString*)str
 {
-	if( clippingRangeMode == 1 || clippingRangeMode == 3  || clippingRangeMode == 2)
+	if( clippingRangeMode == 1 || clippingRangeMode == 3  || clippingRangeMode == 2 || clippingRangeMode == 4)
 	{
 		[self Apply2DOpacityString:str];
 	}
@@ -2260,7 +2260,7 @@ static float deg2rad = M_PI / 180.0;
 	float pWL, pWW;
 	float bpWL, bpWW;
 	
-	if( clippingRangeMode == 1 || clippingRangeMode == 3 || clippingRangeMode == 2)		// MIP
+	if( clippingRangeMode == 1 || clippingRangeMode == 3 || clippingRangeMode == 2 || clippingRangeMode == 4)		// MIP
 	{
 		[mprView1 getWLWW: &pWL :&pWW];
 		[blendedMprView1 getWLWW: &bpWL :&bpWW];
@@ -2273,12 +2273,13 @@ static float deg2rad = M_PI / 180.0;
 	
 	clippingRangeMode = f;
 	
-	[mprView1.vrView setMode: clippingRangeMode];
-	[mprView1.vrView setBlendingMode: clippingRangeMode];
+	// The 3D renderer of the MPR views has no radiograph mode; show the slab as Mean there (the curved views do the radiograph projection)
+	[mprView1.vrView setMode: clippingRangeMode == 4 ? 3 : clippingRangeMode];
+	[mprView1.vrView setBlendingMode: clippingRangeMode == 4 ? 3 : clippingRangeMode];
     
-	if( clippingRangeMode == 1 || clippingRangeMode == 3 || clippingRangeMode == 2)	// MIP - Mean - minIP
+	if( clippingRangeMode == 1 || clippingRangeMode == 3 || clippingRangeMode == 2 || clippingRangeMode == 4)	// MIP - Mean - minIP
 	{
-		if( clippingRangeMode == 3) //mean
+		if( clippingRangeMode == 3 || clippingRangeMode == 4) //mean (radiograph is shown as mean in the MPR views)
 			setvtkMeanIPMode( 1);
 		else
 			setvtkMeanIPMode( 0);
@@ -2319,7 +2320,7 @@ static float deg2rad = M_PI / 180.0;
 	
 	[mprView1 restoreCamera];
 	mprView1.camera.forceUpdate = YES;
-	if( clippingRangeMode == 1  || clippingRangeMode == 3 || clippingRangeMode == 2)
+	if( clippingRangeMode == 1  || clippingRangeMode == 3 || clippingRangeMode == 2 || clippingRangeMode == 4)
 	{
 		[mprView1 setWLWW: pWL :pWW];
 		[blendedMprView1 setWLWW: bpWL :bpWW];
@@ -2333,7 +2334,7 @@ static float deg2rad = M_PI / 180.0;
 	
 	[mprView2 restoreCamera];
 	mprView2.camera.forceUpdate = YES;
-	if( clippingRangeMode == 1  || clippingRangeMode == 3 || clippingRangeMode == 2)
+	if( clippingRangeMode == 1  || clippingRangeMode == 3 || clippingRangeMode == 2 || clippingRangeMode == 4)
 	{
 		[mprView2 setWLWW: pWL :pWW];
 		[blendedMprView2 setWLWW: bpWL :bpWW];
@@ -2347,7 +2348,7 @@ static float deg2rad = M_PI / 180.0;
 	
 	[mprView3 restoreCamera];
 	mprView3.camera.forceUpdate = YES;
-	if( clippingRangeMode == 1  || clippingRangeMode == 3 || clippingRangeMode == 2)
+	if( clippingRangeMode == 1  || clippingRangeMode == 3 || clippingRangeMode == 2 || clippingRangeMode == 4)
 	{
 		[mprView3 setWLWW: pWL :pWW];
 		[blendedMprView3 setWLWW: bpWL :bpWW];
@@ -4310,7 +4311,7 @@ static float deg2rad = M_PI / 180.0;
 	
 	[hiddenVRController addMoviePixList: pix :vData];	
     
-	if( clippingRangeMode == 1 || clippingRangeMode == 3 || clippingRangeMode == 2)
+	if( clippingRangeMode == 1 || clippingRangeMode == 3 || clippingRangeMode == 2 || clippingRangeMode == 4)
 		[mprView1.vrView prepareFullDepthCapture];
 	else
 		[mprView1.vrView restoreFullDepthCapture];
@@ -4331,7 +4332,7 @@ static float deg2rad = M_PI / 180.0;
 	
 	[hiddenVRController setMovieFrame: m];
 	
-	if( clippingRangeMode == 1 || clippingRangeMode == 3 || clippingRangeMode == 2)
+	if( clippingRangeMode == 1 || clippingRangeMode == 3 || clippingRangeMode == 2 || clippingRangeMode == 4)
 		[mprView1.vrView prepareFullDepthCapture];
 	else
 		[mprView1.vrView restoreFullDepthCapture];

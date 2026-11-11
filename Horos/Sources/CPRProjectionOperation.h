@@ -42,6 +42,7 @@ enum _CPRProjectionMode {
     CPRProjectionModeMIP,
     CPRProjectionModeMinIP,
     CPRProjectionModeMean,
+    CPRProjectionModeRadiograph, // simulated X-ray: Beer-Lambert absorption through the slab (CT values in HU), e.g. for dental panoramic views
 	
 	CPRProjectionModeNone = 0xFFFFFF,
 };

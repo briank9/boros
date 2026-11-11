@@ -47,7 +47,8 @@ enum _CPRViewClippingRangeMode {
     CPRViewClippingRangeVRMode = CPRProjectionModeVR, // don't use this, it is not implemented
     CPRViewClippingRangeMIPMode = CPRProjectionModeMIP,
     CPRViewClippingRangeMinIPMode = CPRProjectionModeMinIP,
-    CPRViewClippingRangeMeanMode = CPRProjectionModeMean
+    CPRViewClippingRangeMeanMode = CPRProjectionModeMean,
+    CPRViewClippingRangeRadiographMode = CPRProjectionModeRadiograph
 };
 typedef CPRProjectionMode CPRViewClippingRangeMode;
 
