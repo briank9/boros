@@ -5764,26 +5764,6 @@ static NSMutableDictionary* _receivingDict = nil;
     return preferences;
 }
 
-- (NSString*) smtpServerForFeedbackReport
-{
-    return @"smtp.gmail.com";
-}
-
-- (unsigned int) smtpPortForFeedbackRerport
-{
-    return 465;
-}
-
-- (NSString*) smtpUsername
-{
-    return @"horoscrashreport@gmail.com";
-}
-
-- (NSString*) smtpPassword
-{
-    return @"wmN-7eh-47N-AxJ";
-}
-
 - (NSString*) mailSenderTitle
 {
     return @"Horos";
