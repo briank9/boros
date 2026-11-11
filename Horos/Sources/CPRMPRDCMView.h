@@ -74,6 +74,7 @@ typedef NSInteger CPRMPRDCMViewCPRType;
 	DCMPix *pix;
 	Camera *camera;
 	CPRController *windowController;
+	BOOL windowControllerDetached; // the CPRController is gone: do not draw anymore
     CPRCurvedPath *curvedPath;
     CPRDisplayInfo *displayInfo;
 	NSInteger editingCurvedPathCount;
@@ -117,6 +118,7 @@ typedef NSInteger CPRMPRDCMViewCPRType;
 - (BOOL)is2DTool:(ToolMode)tool;
 - (void) setDCMPixList:(NSMutableArray*)pix filesList:(NSArray*)files roiList:(NSMutableArray*)rois firstImage:(short)firstImage type:(char)type reset:(BOOL)reset;
 - (void) setVRView: (VRView*) v viewID:(int) i;
+- (void) detachWindowController; // called by the CPRController when it goes away: stop using it and stop drawing
 - (void) updateViewMPROnLoading:(BOOL) isLoading;
 - (void) updateViewMPR;
 - (void) updateViewMPR:(BOOL) computeCrossReferenceLines;

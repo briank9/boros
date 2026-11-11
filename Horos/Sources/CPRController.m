@@ -782,6 +782,10 @@ static float deg2rad = M_PI / 180.0;
 
 - (void) dealloc
 {
+    // the MPR views keep an unretained pointer to us and may still get a last redraw after we are gone
+    [mprView1 detachWindowController];
+    [mprView2 detachWindowController];
+    [mprView3 detachWindowController];
 //    [shadingsPresetsController removeObserver:self forKeyPath:@"selectedObjects" context:CPRController.class];
     
     [cprVolumeData invalidateData];

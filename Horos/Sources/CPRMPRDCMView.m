@@ -200,8 +200,19 @@ static CGFloat CPRMPRDCMViewCurveMouseTrackingDistance = 20.0;
 	camera = [[vrView cameraWithThumbnail: NO] retain];
 }
 
+- (void) detachWindowController
+{
+    // windowController is not retained; once the CPRController is gone (after the window closed) a late
+    // redraw must not message it (it crashed in -colorForView: reading the released axis colors)
+    windowController = nil;
+    windowControllerDetached = YES;
+}
+
 - (void) drawRect:(NSRect)rect
 {
+	if( windowControllerDetached) // the CPR window controller is already gone (late redraw after the window closed)
+		return;
+	
 	if( rect.size.width > 10)
 	{
 		[super drawRect: rect];
