@@ -940,7 +940,7 @@ BOOL gPluginsAlertAlreadyDisplayed = NO;
         
 //        NSLog(@"paths: %@", pathsOfPluginsToLoad);
 
-        [self deployHorosCloudPluginAtPath:userPath deployedPlugins:pathsOfPluginsToLoad];
+        // The Horos Cloud service no longer exists; Boros no longer bundles or auto-installs the HorosCloud plugin.
         
         // some plugins require other plugins to be loaded before them
         for (__block NSInteger i = pathsOfPluginsToLoad.count-1; i >= 0; --i) {
