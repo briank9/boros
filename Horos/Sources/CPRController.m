@@ -215,7 +215,7 @@ static float deg2rad = M_PI / 180.0;
 	{
         self->isInitializing = YES;
         
-        self->selectedInterpolationMode = CPRInterpolationModeNearestNeighbor;
+        self->selectedInterpolationMode = CPRInterpolationModeCubic; // smoother panoramic/curved reformats than nearest neighbor
         
 		if( [[NSUserDefaults standardUserDefaults] integerForKey: @"ANNOTATIONS"] == annotNone)
 			[[NSUserDefaults standardUserDefaults] setInteger: annotGraphics forKey: @"ANNOTATIONS"];

@@ -888,7 +888,7 @@ extern int splitPosition[ 3];
 			[[pixArray objectAtIndex: i] setArrayPix:pixArray :i];
 		
 		[self setPixels:pixArray files:NULL rois:NULL firstImage:0 level:'i' reset:YES];
-		[self setScaleValueCentered: 0.8 * self.window.backingScaleFactor];
+		[self setScaleValueCentered: 0.8]; // image is already generated at backing resolution
 		
 		//[self setWLWW:wl :ww];
 		[[self windowController] propagateWLWW: [[self windowController] mprView1]];
@@ -1500,13 +1500,13 @@ extern int splitPosition[ 3];
         
         if( [[self windowController] viewsPosition] == VerticalPosition)
         {
-            request.pixelsWide = [self bounds].size.height*_extraWidthFactor;
-            request.pixelsHigh = [self bounds].size.width*_extraWidthFactor;
+            request.pixelsWide = [self convertSizeToBacking:[self bounds].size].height*_extraWidthFactor; // Retina: generate at backing resolution
+            request.pixelsHigh = [self convertSizeToBacking:[self bounds].size].width*_extraWidthFactor;
 		}
         else
         {
-            request.pixelsWide = [self bounds].size.width*_extraWidthFactor;
-            request.pixelsHigh = [self bounds].size.height*_extraWidthFactor;
+            request.pixelsWide = [self convertSizeToBacking:[self bounds].size].width*_extraWidthFactor; // Retina: generate at backing resolution
+            request.pixelsHigh = [self convertSizeToBacking:[self bounds].size].height*_extraWidthFactor;
 		}
         
         request.slabWidth = _curvedPath.thickness;
